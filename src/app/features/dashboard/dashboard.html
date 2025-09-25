@@ -1,0 +1,133 @@
+<div class="p-6 bg-gray-50 min-h-screen">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Dashboard</h1>
+        <p class="text-gray-600">Welcome back! Here's what's happening with your business today.</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" *ngIf="stats">
+        <mat-card class="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <mat-card-content class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Total Users</p>
+                        <p class="text-3xl font-bold">{{ stats.totalUsers | number }}</p>
+                        <p class="text-blue-100 text-sm mt-1">
+                            <span class="text-green-300">+{{ stats.userGrowth }}%</span> from last month
+                        </p>
+                    </div>
+                    <mat-icon class="text-4xl text-blue-200">people</mat-icon>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="bg-gradient-to-r from-green-500 to-green-600 text-white">
+            <mat-card-content class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">Total Products</p>
+                        <p class="text-3xl font-bold">{{ stats.totalProducts | number }}</p>
+                        <p class="text-green-100 text-sm mt-1">
+                            <span class="text-green-300">+{{ stats.productGrowth }}%</span> from last month
+                        </p>
+                    </div>
+                    <mat-icon class="text-4xl text-green-200">inventory</mat-icon>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+            <mat-card-content class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-purple-100 text-sm font-medium">Total Orders</p>
+                        <p class="text-3xl font-bold">{{ stats.totalOrders | number }}</p>
+                        <p class="text-purple-100 text-sm mt-1">
+                            <span class="text-green-300">+{{ stats.orderGrowth }}%</span> from last month
+                        </p>
+                    </div>
+                    <mat-icon class="text-4xl text-purple-200">shopping_cart</mat-icon>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+            <mat-card-content class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-orange-100 text-sm font-medium">Total Revenue</p>
+                        <p class="text-3xl font-bold">₹{{ stats.totalRevenue | number:'1.2-2' }}</p>
+                        <p class="text-orange-100 text-sm mt-1">
+                            <span class="text-green-300">+{{ stats.revenueGrowth }}%</span> from last month
+                        </p>
+                    </div>
+                    <mat-icon class="text-4xl text-orange-200">money</mat-icon>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+
+    <!-- Loading State -->
+    <app-loading *ngIf="isLoading"></app-loading>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" *ngIf="!isLoading">
+        <!-- Bar Chart -->
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>Monthly Revenue</mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="p-4">
+                <div class="chart-container">
+                    <apx-chart [series]="barChartOptions.series" [chart]="barChartOptions.chart"
+                        [xaxis]="barChartOptions.xaxis" [dataLabels]="barChartOptions.dataLabels"
+                        [plotOptions]="barChartOptions.plotOptions || {}" [yaxis]="barChartOptions.yaxis || {}">
+                    </apx-chart>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Line Chart -->
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>Users & Orders Growth</mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="p-4">
+                <div class="chart-container">
+                    <apx-chart [series]="lineChartOptions.series" [chart]="lineChartOptions.chart"
+                        [xaxis]="lineChartOptions.xaxis" [dataLabels]="lineChartOptions.dataLabels">
+                    </apx-chart>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Pie Chart -->
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>Products by Category</mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="p-4">
+                <div class="chart-container">
+                    <apx-chart [series]="pieChartOptions.series" [chart]="pieChartOptions.chart"
+                        [labels]="pieChartOptions.labels" [legend]="pieChartOptions.legend || {}">
+                    </apx-chart>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Area Chart -->
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>Products Sold</mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="p-4">
+                <div class="chart-container">
+                    <apx-chart [series]="areaChartOptions.series" [chart]="areaChartOptions.chart"
+                        [xaxis]="areaChartOptions.xaxis" [dataLabels]="areaChartOptions.dataLabels"
+                        [fill]="areaChartOptions.fill || {}">
+                    </apx-chart>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

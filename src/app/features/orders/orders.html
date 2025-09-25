@@ -1,0 +1,107 @@
+<h1 mat-dialog-title class="text-xl font-semibold">Order Details - #{{ order.id }}</h1>
+<div mat-dialog-content class="py-4 max-h-96 overflow-y-auto">
+    <div class="space-y-6">
+        <!-- Customer Information -->
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title class="text-lg">Customer Information</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <strong>Name:</strong> {{ order.customerName }}
+                    </div>
+                    <div>
+                        <strong>Email:</strong> {{ order.customerEmail }}
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Order Status -->
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title class="text-lg">Order Status</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="flex items-center gap-4">
+                    <mat-chip-set>
+                        <mat-chip [color]="getStatusColor(order.status)" selected>
+                            {{ order.status }}
+                        </mat-chip>
+                    </mat-chip-set>
+                    <span class="text-sm text-gray-600">
+                        Ordered on {{ order.orderDate | date:'medium' }}
+                    </span>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Order Items -->
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title class="text-lg">Order Items</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="space-y-2" *ngFor="let item of order.items">
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded">
+                        <div>
+                            <div class="font-medium">{{ item.productName }}</div>
+                            <div class="text-sm text-gray-600">
+                                \${{ item.price | number:'1.2-2' }} x {{ item.quantity }}
+                            </div>
+                        </div>
+                        <div class="font-semibold">
+                            \${{ item.subtotal | number:'1.2-2' }}
+                        </div>
+                    </div>
+                </div>
+                <mat-divider class="my-4"></mat-divider>
+                <div class="flex justify-between items-center text-lg font-semibold">
+                    <span>Total</span>
+                    <span>\${{ order.totalAmount | number:'1.2-2' }}</span>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Payment Information -->
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title class="text-lg">Payment Information</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <strong>Payment Method:</strong> {{ order.paymentMethod }}
+                    </div>
+                    <div>
+                        <strong>Payment Status:</strong>
+                        <mat-chip-set class="ml-2">
+                            <mat-chip [color]="getPaymentStatusColor(order.paymentStatus)" selected>
+                                {{ order.paymentStatus }}
+                            </mat-chip>
+                        </mat-chip-set>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Shipping Address -->
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title class="text-lg">Shipping Address</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="text-sm">
+                    <div>{{ order.shippingAddress.street }}</div>
+                    <div>{{ order.shippingAddress.city }}, {{ order.shippingAddress.state }} {{
+                        order.shippingAddress.zipCode }}</div>
+                    <div>{{ order.shippingAddress.country }}</div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>
+<div mat-dialog-actions class="flex justify-end">
+    <button mat-button [mat-dialog-close]="false">Close</button>
+</div>

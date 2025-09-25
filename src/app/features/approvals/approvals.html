@@ -1,0 +1,17 @@
+<h1 mat-dialog-title>Reject Product</h1>
+<div mat-dialog-content class="py-4">
+    <p class="mb-4">Please provide a reason for rejecting this product:</p>
+    <form [formGroup]="rejectForm">
+        <mat-form-field class="w-full">
+            <mat-label>Rejection Reason</mat-label>
+            <textarea matInput formControlName="comments" rows="4" placeholder="Enter reason for rejection...">
+          </textarea>
+        </mat-form-field>
+    </form>
+</div>
+<div mat-dialog-actions class="flex justify-end gap-2">
+    <button mat-button [mat-dialog-close]="null">Cancel</button>
+    <button mat-raised-button color="warn" [disabled]="rejectForm.invalid || isLoading" (click)="onReject()">
+        {{ isLoading ? 'Rejecting...' : 'Reject Product' }}
+    </button>
+</div>
