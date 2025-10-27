@@ -13,34 +13,59 @@
       <button mat-icon-button (click)="collapsed = !collapsed">
         <mat-icon>menu</mat-icon>
       </button>
-      <span *ngIf="!collapsed" class="text-lg font-semibold">Admin Panel</span>
+      @if(!collapsed){
+        <span class="text-lg font-semibold">Admin Panel</span>
+      }
     </mat-toolbar>
 
     <!-- Nav List -->
     <mat-nav-list>
       <a mat-list-item routerLink="/dashboard" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>dashboard</mat-icon>
-        <span *ngIf="!collapsed" matListItemTitle>Dashboard</span>
+        @if(!collapsed){
+          <span matListItemTitle>Dashboard</span>
+        }
       </a>
       <a mat-list-item routerLink="/users" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>people</mat-icon>
-        <span *ngIf="!collapsed" matListItemTitle>Users</span>
+        @if(!collapsed){
+          <span matListItemTitle>Users</span>
+        }
       </a>
       <a mat-list-item routerLink="/products" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>inventory</mat-icon>
-        <span *ngIf="!collapsed" matListItemTitle>Products</span>
+        @if(!collapsed){
+          <span matListItemTitle>Products</span>
+        }
       </a>
+      @let user = (currentUser$ | async);
+      @if (user?.role === "super admin") {
       <a mat-list-item routerLink="/stores" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>store</mat-icon>
-        <span *ngIf="!collapsed" matListItemTitle>Stores</span>
+        @if (!collapsed) {
+        <span matListItemTitle>Stores</span>
+        }
       </a>
+      }
+      @if (user?.role === "super admin") {
+      <a mat-list-item routerLink="/categories" routerLinkActive="active-nav-item">
+        <mat-icon matListItemIcon>category</mat-icon>
+        @if (!collapsed) {
+        <span matListItemTitle>Categories</span>
+        }
+      </a>
+      }
       <a mat-list-item routerLink="/orders" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>shopping_cart</mat-icon>
-        <span *ngIf="!collapsed" matListItemTitle>Orders</span>
+        @if(!collapsed){
+          <span matListItemTitle>Orders</span>
+        }
       </a>
       <a mat-list-item routerLink="/approve-products" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>approval</mat-icon>
-        <span *ngIf="!collapsed" matListItemTitle>Approve Products</span>
+        @if(!collapsed){
+          <span matListItemTitle>Approve Products</span>
+        }
       </a>
     </mat-nav-list>
   </mat-sidenav>

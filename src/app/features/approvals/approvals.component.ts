@@ -250,7 +250,7 @@ export class ApprovalsComponent implements OnInit {
     this.productService.getProducts().subscribe({
       next: (products) => {
         // Filter only non-approved products
-        const pendingProducts = products.filter(p => !p.isApproved);
+        const pendingProducts = products.filter((p:any) => !p.isApproved);
         this.dataSource.data = pendingProducts;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;

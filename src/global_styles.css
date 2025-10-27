@@ -1,9 +1,50 @@
-/* @import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities'; */
 @import "tailwindcss";
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
+/* -------------------------------------------------
+   🌈 Global Theme Variables
+   ------------------------------------------------- */
+:root {
+  /* Primary Brand Colors */
+  --color-primary: #3f51b5;     /* Indigo (Material default) */
+  --color-primary-light: #6573c3;
+  --color-primary-dark: #2c387e;
+
+  /* Accent / Secondary Colors */
+  --color-accent: #ff4081;      /* Pink (Material default) */
+  --color-accent-light: #ff79b0;
+  --color-accent-dark: #c60055;
+
+  /* Backgrounds */
+  --color-bg: #f5f6fa;
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+
+  /* Text Colors */
+  --color-text: #1f2937;
+  --color-text-light: #6b7280;
+
+  /* Success / Warning / Error */
+  --color-success: #4caf50;
+  --color-warning: #ff9800;
+  --color-error: #f44336;
+
+  --logo-bg-color: #03686f;
+  --logo-golden-color: #e2b34e;
+}
+
+/* 🌙 Optional: Dark Mode Variables */
+body.dark-theme {
+  --color-bg: #121212;
+  --color-surface: #1e1e1e;
+  --color-text: #e5e5e5;
+  --color-text-light: #9ca3af;
+  --color-border: #333;
+}
+
+/* -------------------------------------------------
+   🧩 Global Styles
+   ------------------------------------------------- */
 * {
   box-sizing: border-box;
 }
@@ -11,8 +52,40 @@
 body {
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
+/* Example Utility Classes */
+.text-primary {
+  color: var(--color-primary);
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.color-theme-golden-btn{
+  background-color: var(--logo-golden-color) !important;
+  color: white;
+}
+
+/* -------------------------------------------------
+   📊 Chart Container
+   ------------------------------------------------- */
 .chart-container {
   width: 100%;
   height: 300px;

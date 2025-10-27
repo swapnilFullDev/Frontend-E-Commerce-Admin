@@ -1,0 +1,9 @@
+@media (max-width: 768px) {
+  table {
+    display: none;
+  }
+
+  .mat-card {
+    width: 100%;
+  }
+}

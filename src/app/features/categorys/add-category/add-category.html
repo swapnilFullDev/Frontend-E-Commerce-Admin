@@ -1,0 +1,82 @@
+<h1 mat-dialog-title>{{ data ? 'Edit Category' : 'Add Category' }}</h1>
+
+<div mat-dialog-content class="py-4">
+  <form [formGroup]="categoryForm" class="space-y-4">
+
+    <!-- Category Name -->
+    <mat-form-field class="w-full">
+      <mat-label>Category Name</mat-label>
+      <input matInput formControlName="name" placeholder="Enter category name" />
+      <mat-error *ngIf="categoryForm.get('name')?.hasError('required')">
+        Category name is required
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Icon -->
+    <mat-form-field class="w-full">
+      <mat-label>Icon</mat-label>
+      <input matInput formControlName="icon" placeholder="Enter icon name (e.g., bag, shirt)" />
+      <mat-hint>Use Material icon name</mat-hint>
+      <mat-error *ngIf="categoryForm.get('icon')?.hasError('required')">
+        Icon is required
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Parent Category -->
+    <mat-form-field class="w-full">
+      <mat-label>Parent Category</mat-label>
+      <mat-select formControlName="parentId" >
+        <mat-option [value]="null">None</mat-option>
+
+        <!-- Search input inside mat-select panel -->
+        <mat-option>
+          <input
+            matInput
+            placeholder="Search category..."
+            [(ngModel)]="parentCategorySearch"
+            (keyup)="filterParentCategories()"
+            class="w-full p-2"
+          />
+        </mat-option>
+
+        <!-- Filtered categories -->
+        <mat-option
+          *ngFor="let cat of filteredParentCategories"
+          [value]="cat.id"
+        >
+          {{ cat.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Status -->
+    <mat-form-field class="w-full">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option value="active">Active</mat-option>
+        <mat-option value="inactive">Inactive</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Image Upload -->
+    <div class="w-full">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Category Image</label>
+      <input type="file" (change)="onFileSelected($event)" accept="image/*"
+             class="w-full p-2 border border-gray-300 rounded-md" />
+      <div *ngIf="imagePreview" class="mt-2">
+        <img [src]="imagePreview" alt="Preview" class="h-20 w-20 object-cover rounded" />
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- Actions -->
+<div mat-dialog-actions class="flex justify-end gap-2">
+  <button mat-button [mat-dialog-close]="false">Cancel</button>
+  <button mat-raised-button color="primary"
+          [disabled]="categoryForm.invalid || isLoading"
+          (click)="onSave()">
+    {{ isLoading ? 'Saving...' : 'Save' }}
+  </button>
+</div>

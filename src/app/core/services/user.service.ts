@@ -1,7 +1,9 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { User } from '../models/user.interface';
+import { environment } from "../../../environments/environment";
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +11,7 @@ import { User } from '../models/user.interface';
 export class UserService {
   private usersSubject = new BehaviorSubject<User[]>([]);
   public users$ = this.usersSubject.asObservable();
-
+  private httpClient = inject(HttpClient);
   constructor() {
     this.loadMockUsers();
   }

@@ -8,7 +8,12 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { routes } from './app/app.routes';
 import { MatIconModule } from '@angular/material/icon';
-import { provideServiceWorker, ServiceWorkerModule } from '@angular/service-worker';
+import { provideServiceWorker } from '@angular/service-worker';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideStore } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { authInterceptor } from './app/interceptors/auth-interceptor';
 
 @Component({
   selector: 'app-root',
@@ -21,14 +26,15 @@ bootstrapApplication(App, {
   providers: [
     provideRouter(routes),
     provideAnimations(),
-    importProvidersFrom(
-      MatDialogModule,
-      MatSnackBarModule,
-      MatIconModule,
-      // ServiceWorkerModule.register('ngsw-config.json')
-    ), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          })
-  ]
+    provideHttpClient(
+      withInterceptors([authInterceptor])
+    ),
+    importProvidersFrom(MatDialogModule, MatSnackBarModule, MatIconModule), provideServiceWorker('ngsw-worker.js', {
+        enabled: !isDevMode(),
+        registrationStrategy: 'registerWhenStable:30000'
+    }),
+    provideStore(),
+    provideEffects(),
+    provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() })
+]
 }).catch(err => console.error(err));

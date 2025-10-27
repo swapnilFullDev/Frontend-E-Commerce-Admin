@@ -1,12 +1,12 @@
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
     <mat-card class="w-full max-w-md">
-        <mat-card class="p-6 max-w-md mx-auto shadow-lg rounded-lg border-0">
+        <mat-card class="p-6 max-w-md mx-auto rounded-lg border-0">
         <!-- Logo at Top -->
         <div class="flex justify-center mb-4">
             <img 
             src="assets/AttireBandhan.png" 
             alt="Attire Bandhan Logo" 
-            class="h-24 w-24 object-contain rounded-full shadow-md border"
+            class="h-24 w-24 object-contain rounded-full"
             >
         </div>
 
@@ -25,16 +25,16 @@
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
                 <mat-form-field class="w-full">
                     <mat-label>Email</mat-label>
-                    <input matInput type="email" formControlName="email" placeholder="admin@admin.com">
+                    <input matInput type="email" formControlName="username" placeholder="admin@admin.com">
                     <mat-icon matSuffix>email</mat-icon>
                     @if(loginForm.get('email')?.hasError('required')){
                     <mat-error>
-                        Email is required
+                        Email or Username is required
                     </mat-error>
                     }
                     @if(loginForm.get('email')?.hasError('email')){
                     <mat-error>
-                        Please enter a valid email
+                        Please enter a valid email/username
                     </mat-error>
                     }
                 </mat-form-field>
@@ -66,7 +66,7 @@
             </form>
         </mat-card-content>
 
-        <mat-card-actions class="px-6 pb-6">
+        <mat-card-actions class="px-6 pb-6 gap-2">
             <button mat-raised-button color="primary" class="w-full py-3" [disabled]="loginForm.invalid || isLoading"
                 (click)="onSubmit()">
                 @if(!isLoading){
@@ -74,6 +74,10 @@
                 }@else{
                 <span>Signing In...</span>
                 }
+            </button>
+            <button mat-raised-button class="w-full py-3 color-theme-golden-btn" 
+                [routerLink]="['/signup']">
+                Create Account
             </button>
         </mat-card-actions>
     </mat-card>

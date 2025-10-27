@@ -48,7 +48,7 @@ export class MainLayoutComponent implements OnInit {
     private authService: AuthService,
     private router: Router
   ) {
-    this.currentUser$ = this.authService.currentUser$;
+    this.currentUser$ = this.authService.currentUser$;    
   }
 
   ngOnInit(): void {

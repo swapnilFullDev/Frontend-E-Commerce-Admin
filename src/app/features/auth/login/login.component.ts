@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,7 +21,8 @@ import { AuthService } from '../../../core/services/auth.service';
     MatButtonModule,
     MatCardModule,
     MatIconModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    RouterLink
   ],
   templateUrl: "./login.html"
 })
@@ -37,8 +38,8 @@ export class LoginComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {
     this.loginForm = this.fb.group({
-      email: ['admin@admin.com', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      username: ['superadmin@example.com', [Validators.required, Validators.email]],
+      password: ['TempPass123', [Validators.required, Validators.minLength(6)]]
     });
   }
 
@@ -52,7 +53,19 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.valid && !this.isLoading) {
       this.isLoading = true;
       
-      this.authService.login(this.loginForm.value).subscribe({
+      // this.authService.login(this.loginForm.value).subscribe({
+      //   next: (user) => {
+      //     this.snackBar.open('Login successful!', 'Close', { duration: 3000 });
+      //     this.router.navigate(['/dashboard']);
+      //     this.isLoading = false;
+      //   },
+      //   error: (error) => {
+      //     this.snackBar.open('Invalid credentials. Please try again.', 'Close', { duration: 3000 });
+      //     this.isLoading = false;
+      //   }
+      // });
+
+      this.authService.loginUser(this.loginForm.value).subscribe({
         next: (user) => {
           this.snackBar.open('Login successful!', 'Close', { duration: 3000 });
           this.router.navigate(['/dashboard']);
@@ -62,7 +75,7 @@ export class LoginComponent implements OnInit {
           this.snackBar.open('Invalid credentials. Please try again.', 'Close', { duration: 3000 });
           this.isLoading = false;
         }
-      });
+      })
     }
   }
 }
