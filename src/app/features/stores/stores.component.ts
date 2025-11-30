@@ -51,7 +51,7 @@ export class StoresComponent implements OnInit {
     "status",
     "actions",
   ];
-  dataSource = new MatTableDataSource<Store>();
+  dataSource = new MatTableDataSource<any>();
   isLoading = true;
   // store = this.storeService.store;
   store = signal<any[]>([]);
@@ -79,6 +79,7 @@ export class StoresComponent implements OnInit {
     this.isLoading = true;
     this.storeService.getStores().subscribe({
       next: (stores) => {
+        console.log(stores);
         this.dataSource.data = stores;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;

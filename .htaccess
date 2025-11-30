@@ -1,0 +1,72 @@
+# Production .htaccess for Angular single-page app
+# Place this in your project root or in the folder you deploy (e.g. `dist/your-app/`).
+
+# Disable directory listings
+Options -Indexes
+
+######### Compression (mod_deflate) #########
+<IfModule mod_deflate.c>
+  # Compress common text-based responses
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json
+  AddOutputFilterByType DEFLATE application/xml application/xhtml+xml application/rss+xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+######### Caching (mod_expires) #########
+<IfModule mod_expires.c>
+  ExpiresActive On
+  # HTML should be revalidated frequently
+  ExpiresByType text/html "access plus 0 seconds"
+  # Static assets - long cache lifetime
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType text/javascript "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType application/x-javascript "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/gif "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType application/font-woff2 "access plus 1 year"
+  ExpiresByType application/font-woff "access plus 1 year"
+  ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
+  ExpiresByType font/ttf "access plus 1 year"
+  ExpiresByType font/otf "access plus 1 year"
+</IfModule>
+
+######### CORS for fonts #########
+<IfModule mod_headers.c>
+  <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|svg)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
+</IfModule>
+
+######### Security headers (mod_headers) #########
+<IfModule mod_headers.c>
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Referrer-Policy "no-referrer-when-downgrade"
+  # HSTS only if using HTTPS (set by env var or server config)
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+</IfModule>
+
+######### SPA fallback: rewrite all non-file requests to index.html #########
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # If the request is for a real file or directory, serve it directly
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Otherwise, rewrite to index.html so the Angular app can handle the route
+  RewriteRule ^ /index.html [L]
+</IfModule>
+
+# --------------------------
+# Notes:
+# - If your app is deployed to a subfolder (e.g. /my-app/), set
+#   `RewriteBase /my-app/` directly under the RewriteEngine On line.
+# - Place this file inside your built `dist/` folder if your Apache serves that folder.
+# - Ensure Apache modules `mod_rewrite`, `mod_headers`, `mod_expires` and `mod_deflate` are enabled.
+# --------------------------

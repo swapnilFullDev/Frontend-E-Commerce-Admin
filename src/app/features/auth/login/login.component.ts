@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit {
   ) {
     this.loginForm = this.fb.group({
       username: ['superadmin@example.com', [Validators.required, Validators.email]],
-      password: ['TempPass123', [Validators.required, Validators.minLength(6)]]
+      password: ['Test@123', [Validators.required, Validators.minLength(6)]]
     });
   }
 
@@ -64,7 +64,7 @@ export class LoginComponent implements OnInit {
       //     this.isLoading = false;
       //   }
       // });
-
+      console.log(this.loginForm.value);
       this.authService.loginUser(this.loginForm.value).subscribe({
         next: (user) => {
           this.snackBar.open('Login successful!', 'Close', { duration: 3000 });

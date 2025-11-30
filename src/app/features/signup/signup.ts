@@ -44,27 +44,27 @@ export class Signup {
 
   constructor(private fb: FormBuilder) {
     this.userForm = this.fb.group({
-      OwnerName: ["", Validators.required],
-      BusinessName: ["", [Validators.required]],
-      BusinessEmail: ["", [Validators.required]],
-      BusinessPhoneNo: [
+      owner_name: ["", Validators.required],
+      businessName: ["", [Validators.required]],
+      business_email: ["", [Validators.required]],
+      business_phone_no: [
         "",
         [Validators.required],
       ],
-      PersonalPhoneNo: [
+      personal_phone_no: [
         "",
         [Validators.required],
       ],
-      GSTNumber: [""],
-      BusinessDocs: ["", [Validators.required]],
-      BusinessAddress: new FormGroup({
-          full_address: new FormControl('',[Validators.required]),
-          pin_code: new FormControl(''),
+      gst_number: [""],
+      business_docs: ["", [Validators.required]],
+      business_address: new FormGroup({
+          street: new FormControl('',[Validators.required]),
+          pincode: new FormControl(''),
           state: new FormControl(''),
           city: new FormControl(''),
       })
       ,
-      BusinessFrontImage: ["", [Validators.required]],
+      business_front_image: ["", [Validators.required]],
     });
   }
 
@@ -73,8 +73,8 @@ export class Signup {
     if (!file) return;
 
     this.selectedFileName = file.name;
-    this.userForm.patchValue({ BusinessDocs: "https://www.wikihow.com/images/thumb/9/93/Store-Important-Documents-at-Home-Step-8.jpg/v4-460px-Store-Important-Documents-at-Home-Step-8.jpg" });
-    this.userForm.get("BusinessDocs")?.updateValueAndValidity();
+    this.userForm.patchValue({ business_docs: "https://www.wikihow.com/images/thumb/9/93/Store-Important-Documents-at-Home-Step-8.jpg/v4-460px-Store-Important-Documents-at-Home-Step-8.jpg" });
+    this.userForm.get("business_docs")?.updateValueAndValidity();
 
     if (file.type.startsWith("image/")) {
       this.fileType = "image";
@@ -102,8 +102,8 @@ export class Signup {
     if (!file) return;
 
     this.selectedImageName = file.name;
-    this.userForm.patchValue({ BusinessFrontImage: "https://static.vecteezy.com/system/resources/previews/006/398/494/non_2x/illustration-of-store-or-market-flat-design-vector.jpg" });
-    this.userForm.get("BusinessFrontImage")?.updateValueAndValidity();
+    this.userForm.patchValue({ business_front_image: "https://static.vecteezy.com/system/resources/previews/006/398/494/non_2x/illustration-of-store-or-market-flat-design-vector.jpg" });
+    this.userForm.get("business_front_image")?.updateValueAndValidity();
 
     if (file.type.startsWith("image/")) {
       this.fileType = "image";
@@ -122,7 +122,6 @@ export class Signup {
 
   onSave(): void {
     console.log(this.userForm.value);
-    
     if (this.userForm.valid) {
       this.isLoading = true;
       this.authService.signUpStore(this.userForm.value).subscribe((response:any)=>{

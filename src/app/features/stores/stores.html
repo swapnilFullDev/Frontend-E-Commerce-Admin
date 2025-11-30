@@ -39,17 +39,6 @@
              <!-- Table -->
              <div class="hidden md:block overflow-x-auto">
                <table mat-table [dataSource]="dataSource" matSort class="w-full">
-                 <!-- <ng-container matColumnDef="id">
-                   <th
-                     mat-header-cell
-                     *matHeaderCellDef
-                     mat-sort-header
-                     class="font-semibold"
-                   >
-                     ID
-                   </th>
-                   <td mat-cell *matCellDef="let store">{{ store.id }}</td>
-                 </ng-container> -->
    
                  <ng-container matColumnDef="name">
                    <th
@@ -61,7 +50,7 @@
                      Store Name
                    </th>
                    <td mat-cell *matCellDef="let store">
-                     {{ store.businessName }}
+                     {{ store.business_name }}
                    </td>
                  </ng-container>
    
@@ -74,7 +63,7 @@
                    >
                      Location
                    </th>
-                   <td mat-cell *matCellDef="let store">{{ store.businessAddress.city }}</td>
+                   <td mat-cell *matCellDef="let store">{{ store.business_address.city }}</td>
                  </ng-container>
    
                  <ng-container matColumnDef="owner">
@@ -86,7 +75,7 @@
                    >
                      Owner
                    </th>
-                   <td mat-cell *matCellDef="let store">{{ store.ownerName }}</td>
+                   <td mat-cell *matCellDef="let store">{{ store.owner_name }}</td>
                  </ng-container>
    
                  <ng-container matColumnDef="contact">
@@ -95,8 +84,8 @@
                    </th>
                    <td mat-cell *matCellDef="let store">
                      <div class="text-sm">
-                       <div>{{ store.contactPhone }}</div>
-                       <div class="text-gray-500">{{ store.businessPhoneNo }}</div>
+                       <div>{{ store.personal_phone_no }}</div>
+                       <div class="text-gray-500">{{ store.business_phone_no }}</div>
                      </div>
                    </td>
                  </ng-container>
@@ -107,9 +96,9 @@
                    </th>
                    <td mat-cell *matCellDef="let store">
                      <div class="text-sm">
-                       <div>{{ store.businessAddress.full_address }}</div>
+                       <div>{{ store.business_address.full_address }}</div>
                        <div class="text-gray-500">
-                         {{ store.businessAddress.state }} {{ store.businessAddress.zipCode }}
+                         {{ store.business_address.state }} {{ store.business_address.zip_code }}
                        </div>
                      </div>
                    </td>
@@ -121,11 +110,10 @@
                    </th>
                    <td mat-cell *matCellDef="let store">
                      <mat-slide-toggle
-                       [checked]="store.isVerified"
+                       [checked]="store.is_verified == 1"
                        color="primary"
                        (change)="onStatusChange(store.id)"
                      >
-                       {{ store.isVerified ? "Active" : "Inactive" }}
                      </mat-slide-toggle>
                    </td>
                  </ng-container>
@@ -174,28 +162,28 @@
                     <!-- Header -->
                     <div class="flex items-center justify-between">
                       <div>
-                        <h3 class="text-lg font-semibold text-gray-800">{{ store.businessName }}</h3>
-                        <p class="text-sm text-gray-500">{{ store.businessAddress.city }}</p>
+                        <h3 class="text-lg font-semibold text-gray-800">{{ store.business_name }}</h3>
+                        <p class="text-sm text-gray-500">{{ store.business_address.city }}</p>
                       </div>
 
-                      <mat-slide-toggle [checked]="store.isVerified" color="primary" (change)="onStatusChange(store.id)"
+                      <mat-slide-toggle [checked]="store.is_verified" color="primary" (change)="onStatusChange(store.id)"
                         class="!text-xs">
-                        {{ store.isVerified ? 'Active' : 'Inactive' }}
+                        {{ store.is_verified ? 'Active' : 'Inactive' }}
                       </mat-slide-toggle>
                     </div>
 
                     <!-- Owner -->
                     <div class="text-sm">
                       <span class="font-semibold text-gray-700">Owner:</span>
-                      <span class="text-gray-600">{{ store.ownerName }}</span>
+                      <span class="text-gray-600">{{ store.owner_name }}</span>
                     </div>
 
                     <!-- Contact -->
                     <div class="text-sm">
                       <span class="font-semibold text-gray-700">Contact:</span>
                       <div class="text-gray-600">
-                        <div>{{ store.personalPhoneNo }}</div>
-                        <div class="text-gray-500">{{ store.businessPhoneNo }}</div>
+                        <div>{{ store.business_phone_no }}</div>
+                        <div class="text-gray-500">{{ store.business_phone_no }}</div>
                       </div>
                     </div>
 
@@ -203,8 +191,8 @@
                     <div class="text-sm">
                       <span class="font-semibold text-gray-700">Address:</span>
                       <p class="text-gray-600 leading-snug">
-                        {{ store.businessAddress.full_address }} <br>
-                        {{ store.businessAddress.state }} - {{ store.businessAddress.zipCode }}
+                        {{ store.business_address?.full_address }} <br>
+                        {{ store.business_address.state }} - {{ store.business_address.zip_code }}
                       </p>
                     </div>
 

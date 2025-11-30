@@ -5,4 +5,5 @@ export const environment = {
   adminMiddleWare: "/admin",
   productMiddleWare: "/products",
   categoryMiddleWare: "/categories",
+  inventoryMiddleWare: "/inventory",
 };

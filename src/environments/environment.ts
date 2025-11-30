@@ -5,7 +5,8 @@ export const environment = {
   adminMiddleWare: "/admin",
   productMiddleWare: "/products",
   categoryMiddleWare: "/categories",
-
+  inventoryMiddleWare: "/inventory",
 };
 
 // swapnil@yopmail.com , nn9769da
+// laurel wreath
