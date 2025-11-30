@@ -18,25 +18,25 @@ export class StoreService {
   getStores(): Observable<Store[]> {
     return this.httpClient
       .get<any>(`${environment.API_URL}${environment.businessMiddleWare}`)
-      .pipe(
-        map(
-          (data) => (
-            data.map((item:any) => ({
-              id: item.ID,
-              ownerName: item.OwnerName,
-              businessName: item.BusinessName,
-              businessEmail: item.BusinessEmail,
-              businessPhoneNo: item.BusinessPhoneNo,
-              personalPhoneNo: item.PersonalPhoneNo,
-              gstNumber: item.GSTNumber,
-              businessDocs: item.BusinessDocs,
-              businessAddress: item.BusinessAddress,
-              businessFrontImage: item.BusinessFrontImage,
-              isVerified: !!item.isVerified,
-            }))
-          )
-        )
-      )
+      // .pipe(
+      //   map(
+      //     (data) => (
+      //       data.map((item:any) => ({
+      //         id: item.ID,
+      //         ownerName: item.OwnerName,
+      //         businessName: item.BusinessName,
+      //         businessEmail: item.BusinessEmail,
+      //         businessPhoneNo: item.BusinessPhoneNo,
+      //         personalPhoneNo: item.PersonalPhoneNo,
+      //         gstNumber: item.GSTNumber,
+      //         businessDocs: item.BusinessDocs,
+      //         businessAddress: item.BusinessAddress,
+      //         businessFrontImage: item.BusinessFrontImage,
+      //         isVerified: !!item.isVerified,
+      //       }))
+      //     )
+      //   )
+      // )
   }
 
   createStore(store: Omit<Store, "id" | "createdAt">): Observable<Store> {

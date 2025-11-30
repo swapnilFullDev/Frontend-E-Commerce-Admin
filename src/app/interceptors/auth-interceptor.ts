@@ -11,17 +11,25 @@ const AUTH_EXCLUDE_URLS = [
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
   const router = inject(Router);
-  let localData = JSON.parse(localStorage.getItem('currentUser')!);
   let cloned = req;
   
   const shouldSkip = AUTH_EXCLUDE_URLS.some((url) => req.url.includes(url));
 
-  if(!shouldSkip){
-    const token = localData.token;
-    if(cloned){
-      cloned = req.clone({
-        setHeaders: { Authorization: `Bearer ${token}` }
-      })
+  if (!shouldSkip) {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      try {
+        const localData = JSON.parse(storedUser);
+        const token = localData?.token;
+        if (token) {
+          cloned = req.clone({
+            setHeaders: { Authorization: `Bearer ${token}` }
+          });
+        }
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+        // If parsing fails, continue without token - let the server handle it
+      }
     }
   }
 

@@ -1,0 +1,115 @@
+<!-- src/app/components/inventory-list/inventory-list.component.html -->
+<div class="p-6 bg-gray-50 min-h-screen">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">Inventory Management</h1>
+      <p class="text-gray-600">Manage inventory items</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="openDialog()">
+      <mat-icon>add</mat-icon> Add Inventory
+    </button>
+  </div>
+
+  <mat-card>
+    <mat-card-content class="p-6">
+      <div class="mb-4">
+        <mat-form-field class="w-full max-w-md">
+          <mat-label>Search inventory</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Search by product name or business ID" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+      @if(isLoading){
+        <div class="flex justify-center py-10">
+          <!-- <mat-progress-spinner mode="indeterminate"></mat-progress-spinner> -->
+           <app-loading></app-loading>
+        </div>
+      }@else {
+        <div>
+          <div class="overflow-x-auto">
+            <table mat-table [dataSource]="dataSource" matSort class="min-w-full">
+  
+              <ng-container matColumnDef="productImages">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Image</th>
+                <td mat-cell *matCellDef="let element">
+                  <img [ngSrc]="element.product_images || 'assets/AttireBandhan.png'" width="100" height="100" priority>
+                </td>
+              </ng-container>
+  
+              <ng-container matColumnDef="productName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Name</th>
+                <td mat-cell *matCellDef="let element">{{ element.product_name }}</td>
+              </ng-container>
+  
+              <ng-container matColumnDef="availableSizes">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Available Sizes</th>
+                <td mat-cell *matCellDef="let element">{{ element.available_sizes || '--' }}</td>
+              </ng-container>
+  
+              <ng-container matColumnDef="availableColour">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Available Colour</th>
+                <td mat-cell *matCellDef="let element">{{ element.available_colour || '--' }}</td>
+              </ng-container>
+  
+              <ng-container matColumnDef="prices">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Prices</th>
+                <td mat-cell *matCellDef="let element">{{ element.price || 0 | currency:'INR':'symbol':'1.2-2' }}</td>
+              </ng-container>
+  
+              <ng-container matColumnDef="isReturnAcceptable">
+                <th mat-header-cell *matHeaderCellDef>Return Acceptable</th>
+                <td mat-cell *matCellDef="let element">
+                  <mat-slide-toggle color="primary" [checked]="element.is_return_acceptable == 1"></mat-slide-toggle>
+                </td>
+              </ng-container>
+  
+              <ng-container matColumnDef="isAvailableOnRent">
+                <th mat-header-cell *matHeaderCellDef>Available On Rent</th>
+                <td mat-cell *matCellDef="let element">
+                  <mat-slide-toggle color="primary" [checked]="element.is_available_on_rent == 1" (change)="onRentToggleChange(element.iD,$event.checked,'Rent')"></mat-slide-toggle>
+                </td>
+              </ng-container>
+  
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+                <td mat-cell *matCellDef="let element">
+                  <mat-slide-toggle color="primary" [checked]="element.status === 'Active'" (change)="onRentToggleChange(element.iD,$event.checked,'Status')"></mat-slide-toggle>
+                </td>
+              </ng-container>
+  
+              <ng-container matColumnDef="category">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
+                <td mat-cell *matCellDef="let element">{{ element.category }}</td>
+              </ng-container>
+  
+              <ng-container matColumnDef="availableOnline">
+                <th mat-header-cell *matHeaderCellDef>Available Online</th>
+                <td mat-cell *matCellDef="let element">
+                  <mat-slide-toggle color="primary" [checked]="element.availableOnline == 1" (change)="onRentToggleChange(element.iD,$event.checked,'Online')"></mat-slide-toggle>
+                </td>
+              </ng-container>
+  
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let element">
+                  <button mat-icon-button color="primary" (click)="openDialog(element)" matTooltip="Edit">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="deleteItem(element)" matTooltip="Delete">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+  
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            </table>
+          </div>
+  
+          <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
+        </div>
+      }
+
+    </mat-card-content>
+  </mat-card>
+</div>

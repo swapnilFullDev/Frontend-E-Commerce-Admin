@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './core/guards/auth.guard';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -9,16 +9,20 @@ export const routes: Routes = [
   },
   {
     path: 'signup',
-    loadComponent:() => import('./features/signup/signup').then(s => s.Signup)
+    loadComponent: () => import('./features/signup/signup').then(s => s.Signup)
   },
   {
     path: '',
     loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     children: [
       {
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
+      {
+        path: 'inventory',
+        loadComponent: () => import('./features/inventory/inventory').then(i => i.Inventory)
       },
       {
         path: 'users',

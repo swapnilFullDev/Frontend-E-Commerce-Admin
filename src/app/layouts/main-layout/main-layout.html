@@ -26,28 +26,34 @@
           <span matListItemTitle>Dashboard</span>
         }
       </a>
-      <a mat-list-item routerLink="/users" routerLinkActive="active-nav-item">
-        <mat-icon matListItemIcon>people</mat-icon>
+      <a mat-list-item routerLink="/inventory" routerLinkActive="active-nav-item">
+        <mat-icon matListItemIcon>inventory</mat-icon>
         @if(!collapsed){
-          <span matListItemTitle>Users</span>
+          <span matListItemTitle>Inventory</span>
         }
       </a>
       <a mat-list-item routerLink="/products" routerLinkActive="active-nav-item">
-        <mat-icon matListItemIcon>inventory</mat-icon>
+        <mat-icon matListItemIcon>assessment</mat-icon>
         @if(!collapsed){
           <span matListItemTitle>Products</span>
         }
       </a>
       @let user = (currentUser$ | async);
-      @if (user?.role === "super admin") {
+      @if (user?.role === "super_admin") {
       <a mat-list-item routerLink="/stores" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>store</mat-icon>
         @if (!collapsed) {
         <span matListItemTitle>Stores</span>
         }
       </a>
+      <a mat-list-item routerLink="/users" routerLinkActive="active-nav-item">
+        <mat-icon matListItemIcon>people</mat-icon>
+        @if(!collapsed){
+          <span matListItemTitle>Users</span>
+        }
+      </a>
       }
-      @if (user?.role === "super admin") {
+      @if (user?.role === "super_admin") {
       <a mat-list-item routerLink="/categories" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>category</mat-icon>
         @if (!collapsed) {
@@ -55,6 +61,12 @@
         }
       </a>
       }
+      <a mat-list-item routerLink="/orders" routerLinkActive="active-nav-item">
+        <mat-icon matListItemIcon>motorcycle</mat-icon>
+        @if(!collapsed){
+          <span matListItemTitle>Delivery Rider</span>
+        }
+      </a>
       <a mat-list-item routerLink="/orders" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>shopping_cart</mat-icon>
         @if(!collapsed){
