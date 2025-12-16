@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
 @Injectable({
   providedIn: "root",
 })
-export class ProductService {
+export class RentalProductService {
   httpClient = inject(HttpClient);
   private productsSubject = new BehaviorSubject<Product[]>([]);
   public products$ = this.productsSubject.asObservable();
@@ -46,8 +46,8 @@ export class ProductService {
     this.productsSubject.next(mockProducts);
   }
 
-  getProducts(): Observable<any> {
-    return this.httpClient.get<any[]>(`${environment.API_URL}${environment.inventoryMiddleWare}/online-products/filter?sizes=&colors=&priceRange=&searchKeyword=&page=1&limit=10`);
+  getRentalProducts(): Observable<any> {
+    return this.httpClient.get<any[]>(`${environment.API_URL}${environment.inventoryMiddleWare}/online-rentals/filter?sizes=L&rentalPriceRange=0-50&page=1&limit=10`);
   }
 
   getCategories(): Observable<ProductCategory[]> {

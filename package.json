@@ -36,6 +36,7 @@
     "@angular/cli": "^20.2.4",
     "@angular/compiler-cli": "^20.2.4",
     "@angular/core": "^20.2.4",
+    "baseline-browser-mapping": "^2.9.7",
     "typescript": "^5.8.2"
   }
 }

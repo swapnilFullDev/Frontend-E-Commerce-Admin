@@ -38,8 +38,8 @@ export class LoginComponent implements OnInit {
     private snackBar: MatSnackBar
   ) {
     this.loginForm = this.fb.group({
-      username: ['superadmin@example.com', [Validators.required, Validators.email]],
-      password: ['Test@123', [Validators.required, Validators.minLength(6)]]
+      email: ['superAdmin@attirebandhan.com', [Validators.required, Validators.email]],
+      password: ['Admin@123', [Validators.required, Validators.minLength(6)]]
     });
   }
 

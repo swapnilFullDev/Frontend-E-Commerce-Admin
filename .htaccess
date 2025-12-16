@@ -43,24 +43,28 @@ Options -Indexes
 
 ######### Security headers (mod_headers) #########
 <IfModule mod_headers.c>
-  Header always set X-Frame-Options "SAMEORIGIN"
-  Header always set X-Content-Type-Options "nosniff"
-  Header always set X-XSS-Protection "1; mode=block"
-  Header always set Referrer-Policy "no-referrer-when-downgrade"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "no-referrer-when-downgrade"
   # HSTS only if using HTTPS (set by env var or server config)
-  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+  <If "%{HTTPS} == 'on'">
+    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  </If>
 </IfModule>
 
 ######### SPA fallback: rewrite all non-file requests to index.html #########
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  RewriteBase /
+  
   # If the request is for a real file or directory, serve it directly
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
   # Otherwise, rewrite to index.html so the Angular app can handle the route
-  RewriteRule ^ /index.html [L]
+  RewriteRule ^ index.html [L]
 </IfModule>
 
 # --------------------------

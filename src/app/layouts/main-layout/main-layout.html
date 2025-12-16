@@ -1,11 +1,7 @@
-<mat-sidenav-container class="sidenav-container h-screen" autosize >
+@let user = (currentUser$ | async);
+<mat-sidenav-container class="sidenav-container h-screen" autosize>
   <!-- Drawer -->
-  <mat-sidenav #drawer
-    fixedInViewport
-    mode="side"
-    [opened]="true"
-    autosize
-    [class.collapsed]="collapsed"
+  <mat-sidenav #drawer fixedInViewport mode="side" [opened]="true" autosize [class.collapsed]="collapsed"
     class="bg-white shadow-md transition-all duration-300 overflow-hidden">
 
     <!-- Header with toggle -->
@@ -14,7 +10,7 @@
         <mat-icon>menu</mat-icon>
       </button>
       @if(!collapsed){
-        <span class="text-lg font-semibold">Admin Panel</span>
+      <span class="text-lg font-semibold">Admin Panel</span>
       }
     </mat-toolbar>
 
@@ -23,22 +19,18 @@
       <a mat-list-item routerLink="/dashboard" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>dashboard</mat-icon>
         @if(!collapsed){
-          <span matListItemTitle>Dashboard</span>
+        <span matListItemTitle>Dashboard</span>
         }
       </a>
+      @if (user?.role !== "super_admin"){
       <a mat-list-item routerLink="/inventory" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>inventory</mat-icon>
         @if(!collapsed){
-          <span matListItemTitle>Inventory</span>
+        <span matListItemTitle>Inventory</span>
         }
       </a>
-      <a mat-list-item routerLink="/products" routerLinkActive="active-nav-item">
-        <mat-icon matListItemIcon>assessment</mat-icon>
-        @if(!collapsed){
-          <span matListItemTitle>Products</span>
-        }
-      </a>
-      @let user = (currentUser$ | async);
+      }
+
       @if (user?.role === "super_admin") {
       <a mat-list-item routerLink="/stores" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>store</mat-icon>
@@ -49,36 +41,94 @@
       <a mat-list-item routerLink="/users" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>people</mat-icon>
         @if(!collapsed){
-          <span matListItemTitle>Users</span>
+        <span matListItemTitle>Users</span>
+        }
+      </a>
+      <a mat-list-item routerLink="/orders" routerLinkActive="active-nav-item">
+        <mat-icon matListItemIcon>motorcycle</mat-icon>
+        @if(!collapsed){
+        <span matListItemTitle>Delivery Rider</span>
         }
       </a>
       }
-      @if (user?.role === "super_admin") {
+
+      <!-- <a mat-list-item routerLink="/products" routerLinkActive="active-nav-item">
+        <mat-icon matListItemIcon>assessment</mat-icon>
+        @if(!collapsed){
+        <span matListItemTitle>Online Products</span>
+        }
+      </a> -->
+
+      <a mat-list-item class="cursor-pointer" (click)="toggleDropdown('products')" routerLinkActive="active-nav-item">
+        <mat-icon matListItemIcon>assessment</mat-icon>
+        @if(!collapsed){
+        <span matListItemTitle class="flex">
+          <span>Online Products</span>
+          <mat-icon class="ml-auto">{{ dropdownStates.products ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </span>
+        }
+      </a>
+      @if(dropdownStates.products && !collapsed){
+      <div class="ml-8">
+        <a mat-list-item routerLink="/products" routerLinkActive="active-nav-item">
+          <mat-icon matListItemIcon>assessment</mat-icon>
+          @if(!collapsed){
+          <span matListItemTitle>Products</span>
+          }
+        </a>
+        @if (user?.role === "super_admin"){
+          <a mat-list-item routerLink="/approve-products" routerLinkActive="active-nav-item" class="text-sm">
+            <span matListItemTitle>Approve Products</span>
+          </a>
+        }
+      </div>
+      }
+      <a mat-list-item routerLink="/rental-products" routerLinkActive="active-nav-item">
+        <mat-icon matListItemIcon>loop</mat-icon>
+        @if(!collapsed){
+        <span matListItemTitle>Rental Products</span>
+        }
+      </a>
+      <!-- @if (user?.role === "super_admin") {
       <a mat-list-item routerLink="/categories" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>category</mat-icon>
         @if (!collapsed) {
         <span matListItemTitle>Categories</span>
         }
       </a>
-      }
-      <a mat-list-item routerLink="/orders" routerLinkActive="active-nav-item">
-        <mat-icon matListItemIcon>motorcycle</mat-icon>
-        @if(!collapsed){
-          <span matListItemTitle>Delivery Rider</span>
-        }
-      </a>
-      <a mat-list-item routerLink="/orders" routerLinkActive="active-nav-item">
+      } -->
+
+      <a mat-list-item class="cursor-pointer" (click)="toggleDropdown('orders')" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>shopping_cart</mat-icon>
         @if(!collapsed){
-          <span matListItemTitle>Orders</span>
+        <span matListItemTitle class="flex">
+          <span>All Orders</span>
+          <mat-icon class="ml-auto">{{ dropdownStates.orders ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </span>
         }
       </a>
-      <a mat-list-item routerLink="/approve-products" routerLinkActive="active-nav-item">
+      @if(dropdownStates.orders && !collapsed){
+      <div class="ml-8">
+        <a mat-list-item routerLink="/orders/pending" routerLinkActive="active-nav-item" class="text-sm">
+          <span matListItemTitle>Pending Orders</span>
+        </a>
+        <a mat-list-item routerLink="/orders/confirmed" routerLinkActive="active-nav-item" class="text-sm">
+          <span matListItemTitle>Confirmed Orders</span>
+        </a>
+        <a mat-list-item routerLink="/orders/delivered" routerLinkActive="active-nav-item" class="text-sm">
+          <span matListItemTitle>Delivered Orders</span>
+        </a>
+        <a mat-list-item routerLink="/orders/cancelled" routerLinkActive="active-nav-item" class="text-sm">
+          <span matListItemTitle>Cancelled Orders</span>
+        </a>
+      </div>
+      }
+      <!-- <a mat-list-item routerLink="/approve-products" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>approval</mat-icon>
         @if(!collapsed){
-          <span matListItemTitle>Approve Products</span>
+          <span matListItemTitle>Products</span>
         }
-      </a>
+      </a> -->
     </mat-nav-list>
   </mat-sidenav>
 
@@ -94,7 +144,7 @@
       <!-- User Menu -->
       <button mat-button [matMenuTriggerFor]="userMenu" class="flex items-center gap-2">
         <mat-icon>account_circle</mat-icon>
-        <span *ngIf="currentUser$ | async as user">{{ user.name }}</span>
+        <span *ngIf="currentUser$ | async as user">{{ user.fullName }}</span>
         <mat-icon>expand_more</mat-icon>
       </button>
 

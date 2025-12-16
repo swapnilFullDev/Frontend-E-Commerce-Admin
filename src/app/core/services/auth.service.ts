@@ -21,26 +21,6 @@ export class AuthService {
     }
   }
 
-  // login(credentials: LoginCredentials): Observable<AuthUser> {
-  //   if (
-  //     credentials.username === "admin@admin.com" &&
-  //     credentials.password === "admin@123"
-  //   ) {
-  //     const user: AuthUser = {
-  //       id: 1,
-  //       name: "Admin User",
-  //       email: credentials.username,
-  //       role: "Admin",
-  //       token: "mock-jwt-token",
-  //     };
-  //     localStorage.setItem("currentUser", JSON.stringify(user));
-  //     this.currentUserSubject.next(user);
-
-  //     return of(user).pipe(delay(1000));
-  //   }
-  //   return throwError(() => new Error("Invalid credentials"));
-  // }
-
   loginUser(credentials: any): Observable<any> {
     return this.httpClient
       .post(`${this.baseUrl}${environment.authMiddleWare}/login`, credentials)
@@ -74,7 +54,7 @@ export class AuthService {
 
   signUpStore(storeData: any) {
     return this.httpClient.post(
-      `${this.baseUrl}${environment.businessMiddleWare}`,
+      `${this.baseUrl}${environment.businessMiddleWare}/create`,
       storeData
     );
   }

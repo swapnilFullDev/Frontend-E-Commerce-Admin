@@ -11,7 +11,7 @@ export class InventoryService {
   httpClient = inject(HttpClient);
 
   getAll(): Observable<InventoryItem[]> {
-    return this.httpClient.get<InventoryItem[]>(`${environment.API_URL}${environment.inventoryMiddleWare}`);
+    return this.httpClient.get<InventoryItem[]>(`${environment.API_URL}${environment.inventoryMiddleWare}/get-all/inventories`);
   }
 
   getById(id: number): Observable<InventoryItem> {
