@@ -1,4 +1,4 @@
-import { Component, effect, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, effect, OnInit, AfterViewInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
@@ -40,9 +40,8 @@ import { AddStore } from './add-store/add-store';
   ],
   templateUrl: './stores.html',
 })
-export class StoresComponent implements OnInit {
+export class StoresComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [
-    // "id",
     "name",
     "location",
     "owner",
@@ -53,8 +52,15 @@ export class StoresComponent implements OnInit {
   ];
   dataSource = new MatTableDataSource<any>();
   isLoading = true;
-  // store = this.storeService.store;
   store = signal<any[]>([]);
+  
+  // Pagination properties
+  currentPage = 1;
+  pageSize = 5;
+  totalItems = 0;
+  totalPages = 0;
+  searchTerm = '';
+  
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -75,13 +81,31 @@ export class StoresComponent implements OnInit {
     this.loadStores();
   }
 
+  ngAfterViewInit(): void {
+    // Paginator is now handled by (page) event in template
+  }
+
+  onPageChange(event: any): void {
+    this.currentPage = event.pageIndex + 1;
+    this.pageSize = event.pageSize;
+    this.loadStores();
+  }
+
   private loadStores(): void {
     this.isLoading = true;
-    this.storeService.getStores().subscribe({
-      next: (stores) => {
-        console.log(stores);
-        this.dataSource.data = stores;
-        this.dataSource.paginator = this.paginator;
+    this.storeService.getStores(this.currentPage, this.pageSize, this.searchTerm).subscribe({
+      next: (response: any) => {
+        console.log(response);
+        this.dataSource.data = response.data;
+        
+        // Update pagination info from API response
+        this.totalItems = response.total;
+        this.totalPages = response.totalPages;
+        this.currentPage = response.page;
+        this.pageSize = response.limit;
+        
+        // Disable client-side pagination since we're using server-side
+        this.dataSource.paginator = null;
         this.dataSource.sort = this.sort;
         this.isLoading = false;
       },
@@ -108,7 +132,12 @@ export class StoresComponent implements OnInit {
 
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+    this.searchTerm = filterValue.trim();
+    this.currentPage = 1; // Reset to first page when searching
+    if (this.paginator) {
+      this.paginator.pageIndex = 0;
+    }
+    this.loadStores();
   }
 
   openStoreModal(store?: Store): void {
@@ -142,10 +171,10 @@ export class StoresComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.storeService.deleteStore(store.id).subscribe({
+        this.storeService.deleteStore(store.businessId).subscribe({
           next: () => {
             this.loadStores();
-             this.store.update((stores:any) => stores.filter((s:any) => s.id !== store.id));
+            this.store.update((stores:any) => stores.filter((s:any) => s.businessId !== store.businessId));
             this.snackBar.open("Store deleted successfully", "Close", {
               duration: 3000,
             });

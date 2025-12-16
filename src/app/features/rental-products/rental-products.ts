@@ -13,14 +13,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 
 import { Product } from '../../core/models/product.interface';
-import { ProductService } from '../../core/services/product.service';
+import { RentalProductService } from '../../core/services/rentalProduct.service';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
-import { AddProduct } from './add-product/add-product';
+// import { AddRentalProducts } from './add-rental-products/add-rental-products';
 
 @Component({
-  selector: 'app-products',
-  standalone: true,
+  selector: 'app-rental-products',
   imports: [
     CommonModule,
     MatTableModule,
@@ -36,18 +35,19 @@ import { AddProduct } from './add-product/add-product';
     MatChipsModule,
     LoadingComponent
   ],
-  templateUrl: "./products.html"
+  templateUrl: './rental-products.html',
+  styleUrl: './rental-products.css'
 })
-export class ProductsComponent implements OnInit {
+export class RentalProducts {
   displayedColumns: string[] = ['id', 'name', 'price', 'category', 'stock', 'status', 'actions'];
-  dataSource = new MatTableDataSource<any>();
+  dataSource = new MatTableDataSource<Product>();
   isLoading = true;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
-    private productService: ProductService,
+    private rentalProductService: RentalProductService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
@@ -58,10 +58,10 @@ export class ProductsComponent implements OnInit {
 
   private loadProducts(): void {
     this.isLoading = true;
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        console.log(products);
-        this.dataSource.data = products;
+    this.rentalProductService.getRentalProducts().subscribe({
+      next: (rentalProducts) => {
+        console.log(rentalProducts);
+        this.dataSource.data = rentalProducts;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
         this.isLoading = false;
@@ -78,19 +78,19 @@ export class ProductsComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  openProductModal(product?: Product): void {
-    const dialogRef = this.dialog.open(AddProduct, {
-      width: '600px',
-      data: product || null
-    });
+  // openProductModal(product?: Product): void {
+  //   const dialogRef = this.dialog.open(AddRentalProducts, {
+  //     width: '600px',
+  //     data: product || null
+  //   });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadProducts();
-        this.snackBar.open(product ? 'Product updated successfully' : 'Product created successfully', 'Close', { duration: 3000 });
-      }
-    });
-  }
+  //   dialogRef.afterClosed().subscribe(result => {
+  //     if (result) {
+  //       this.loadProducts();
+  //       this.snackBar.open(product ? 'Rental product updated successfully' : 'Rental product created successfully', 'Close', { duration: 3000 });
+  //     }
+  //   });
+  // }
 
   deleteProduct(product: Product): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -105,7 +105,7 @@ export class ProductsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.productService.deleteProduct(product.id).subscribe({
+        this.rentalProductService.deleteProduct(product.id).subscribe({
           next: () => {
             this.loadProducts();
             this.snackBar.open('Product deleted successfully', 'Close', { duration: 3000 });

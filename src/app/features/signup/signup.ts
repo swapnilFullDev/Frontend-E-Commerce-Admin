@@ -41,6 +41,8 @@ export class Signup {
   filePreview: string | any = null;
   fileType: "image" | "pdf" | "other" = "other";
   filePreviewShop: string | any = null;
+  selectedBusinessDoc: File | null = null;
+  selectedShopImage: File | null = null;
 
   constructor(private fb: FormBuilder) {
     this.userForm = this.fb.group({
@@ -62,8 +64,7 @@ export class Signup {
           pincode: new FormControl(''),
           state: new FormControl(''),
           city: new FormControl(''),
-      })
-      ,
+      }),
       business_front_image: ["", [Validators.required]],
     });
   }
@@ -73,7 +74,8 @@ export class Signup {
     if (!file) return;
 
     this.selectedFileName = file.name;
-    this.userForm.patchValue({ business_docs: "https://www.wikihow.com/images/thumb/9/93/Store-Important-Documents-at-Home-Step-8.jpg/v4-460px-Store-Important-Documents-at-Home-Step-8.jpg" });
+    this.selectedBusinessDoc = file;
+    this.userForm.patchValue({ business_docs: file.name });
     this.userForm.get("business_docs")?.updateValueAndValidity();
 
     if (file.type.startsWith("image/")) {
@@ -87,9 +89,7 @@ export class Signup {
       reader.readAsDataURL(file);
     } else if (file.type === "application/pdf") {
       this.fileType = "pdf";
-      const reader = new FileReader();
       const blobUrl = URL.createObjectURL(file);
-      console.log(this.filePreview);
       this.filePreview = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
     } else {
       this.fileType = "other";
@@ -102,11 +102,11 @@ export class Signup {
     if (!file) return;
 
     this.selectedImageName = file.name;
-    this.userForm.patchValue({ business_front_image: "https://static.vecteezy.com/system/resources/previews/006/398/494/non_2x/illustration-of-store-or-market-flat-design-vector.jpg" });
+    this.selectedShopImage = file;
+    this.userForm.patchValue({ business_front_image: file.name });
     this.userForm.get("business_front_image")?.updateValueAndValidity();
 
     if (file.type.startsWith("image/")) {
-      this.fileType = "image";
       const reader = new FileReader();
       reader.onload = () => {
         this.filePreviewShop = this.sanitizer.bypassSecurityTrustResourceUrl(
@@ -115,21 +115,49 @@ export class Signup {
       };
       reader.readAsDataURL(file);
     } else {
-      this.fileType = "other";
       this.filePreviewShop = null;
     }
   }
 
   onSave(): void {
-    console.log(this.userForm.value);
     if (this.userForm.valid) {
       this.isLoading = true;
-      this.authService.signUpStore(this.userForm.value).subscribe((response:any)=>{
+      
+      const formData = new FormData();
+      const formValue = this.userForm.value;
+      
+      // Add files
+      if (this.selectedShopImage) {
+        formData.append('frontImage', this.selectedShopImage);
+      }
+      if (this.selectedBusinessDoc) {
+        formData.append('docs', this.selectedBusinessDoc);
+      }
+      
+      // Add form fields with correct keys
+      formData.append('businessName', formValue.businessName || '');
+      formData.append('ownerName', formValue.owner_name || '');
+      formData.append('businessEmail', formValue.business_email || '');
+      formData.append('businessPhoneNo', formValue.business_phone_no || '');
+      formData.append('personalPhoneNo', formValue.personal_phone_no || '');
+      formData.append('gstNumber', formValue.gst_number || '');
+      
+      // Handle business address as JSON string
+      const businessAddress = {
+        city: formValue.business_address?.city || '',
+        state: formValue.business_address?.state || '',
+        street: formValue.business_address?.street || '',
+        pincode: formValue.business_address?.pincode || ''
+      };
+      formData.append('businessAddress', JSON.stringify(businessAddress));
+      
+      this.authService.signUpStore(formData).subscribe((response: any) => {
         console.log(response);
-      })
-      setTimeout(() => {
         this.isLoading = false;
-      }, 1000);
+      }, error => {
+        console.error(error);
+        this.isLoading = false;
+      });
     }
   }
 }

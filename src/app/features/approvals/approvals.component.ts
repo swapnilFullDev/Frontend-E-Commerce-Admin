@@ -31,7 +31,7 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
     MatInputModule,
     MatButtonModule
   ],
-  templateUrl: "./approvals.html"
+  templateUrl: "./reject-modal.html"
 })
 export class RejectModalComponent {
   rejectForm: FormGroup;
@@ -74,157 +74,7 @@ export class RejectModalComponent {
     MatCheckboxModule,
     LoadingComponent
   ],
-  template: `
-    <div class="p-6 bg-gray-50 min-h-screen">
-      <div class="flex justify-between items-center mb-6">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-800 mb-2">Product Approvals</h1>
-          <p class="text-gray-600">Review and approve pending products</p>
-        </div>
-        <div class="flex gap-2" *ngIf="selection.hasValue()">
-          <button 
-            mat-raised-button 
-            color="primary" 
-            (click)="bulkApprove()"
-            class="flex items-center gap-2">
-            <mat-icon>check</mat-icon>
-            Approve Selected ({{ selection.selected.length }})
-          </button>
-          <button 
-            mat-raised-button 
-            color="warn" 
-            (click)="bulkReject()"
-            class="flex items-center gap-2">
-            <mat-icon>close</mat-icon>
-            Reject Selected ({{ selection.selected.length }})
-          </button>
-        </div>
-      </div>
-
-      <mat-card>
-        <mat-card-content class="p-6">
-          <!-- Search -->
-          <div class="mb-4">
-            <mat-form-field  class="w-full max-w-md">
-              <mat-label>Search pending products</mat-label>
-              <input matInput (keyup)="applyFilter($event)" placeholder="Search by name or submitted by">
-              <mat-icon matSuffix>search</mat-icon>
-            </mat-form-field>
-          </div>
-
-          <!-- Loading -->
-          <app-loading *ngIf="isLoading"></app-loading>
-
-          <!-- Table -->
-          <div class="overflow-x-auto" *ngIf="!isLoading">
-            <table mat-table [dataSource]="dataSource" matSort class="w-full">
-              
-              <ng-container matColumnDef="select">
-                <th mat-header-cell *matHeaderCellDef>
-                  <mat-checkbox (change)="$event ? masterToggle() : null"
-                               [checked]="selection.hasValue() && isAllSelected()"
-                               [indeterminate]="selection.hasValue() && !isAllSelected()">
-                  </mat-checkbox>
-                </th>
-                <td mat-cell *matCellDef="let product">
-                  <mat-checkbox (click)="$event.stopPropagation()"
-                               (change)="$event ? selection.toggle(product) : null"
-                               [checked]="selection.isSelected(product)">
-                  </mat-checkbox>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> ID </th>
-                <td mat-cell *matCellDef="let product"> {{ product.id }} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> Product Name </th>
-                <td mat-cell *matCellDef="let product"> {{ product.name }} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="price">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> Price </th>
-                <td mat-cell *matCellDef="let product"> \${{ product.price | number:'1.2-2' }} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="category">
-                <th mat-header-cell *matHeaderCellDef class="font-semibold"> Category </th>
-                <td mat-cell *matCellDef="let product">
-                  <mat-chip-set>
-                    <mat-chip color="primary" selected>{{ product.category }}</mat-chip>
-                  </mat-chip-set>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="submittedBy">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> Submitted By </th>
-                <td mat-cell *matCellDef="let product"> {{ product.submittedBy || 'Unknown' }} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="submittedDate">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> Date </th>
-                <td mat-cell *matCellDef="let product"> 
-                  {{ product.submittedDate ? (product.submittedDate | date:'shortDate') : (product.createdAt | date:'shortDate') }}
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef class="font-semibold"> Status </th>
-                <td mat-cell *matCellDef="let product">
-                  <mat-chip-set>
-                    <mat-chip color="warn" selected>Pending</mat-chip>
-                  </mat-chip-set>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef class="font-semibold"> Actions </th>
-                <td mat-cell *matCellDef="let product">
-                  <button 
-                    mat-icon-button 
-                    color="primary" 
-                    (click)="approveProduct(product)"
-                    matTooltip="Approve product">
-                    <mat-icon>check_circle</mat-icon>
-                  </button>
-                  <button 
-                    mat-icon-button 
-                    color="warn" 
-                    (click)="rejectProduct(product)"
-                    matTooltip="Reject product">
-                    <mat-icon>cancel</mat-icon>
-                  </button>
-                  <button 
-                    mat-icon-button 
-                    (click)="viewProduct(product)"
-                    matTooltip="View details">
-                    <mat-icon>visibility</mat-icon>
-                  </button>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
-            </table>
-
-            <mat-paginator 
-              [pageSizeOptions]="[5, 10, 20]" 
-              showFirstLastButtons
-              class="mt-4">
-            </mat-paginator>
-
-            <div *ngIf="dataSource.data.length === 0" class="text-center py-8 text-gray-500">
-              <mat-icon class="text-6xl mb-4">inventory</mat-icon>
-              <p class="text-lg">No pending products to review</p>
-              <p>All products have been approved or rejected</p>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  `
+  templateUrl: "./approvals.html"
 })
 export class ApprovalsComponent implements OnInit {
   displayedColumns: string[] = ['select', 'id', 'name', 'price', 'category', 'submittedBy', 'submittedDate', 'status', 'actions'];
@@ -249,9 +99,7 @@ export class ApprovalsComponent implements OnInit {
     this.isLoading = true;
     this.productService.getProducts().subscribe({
       next: (products) => {
-        // Filter only non-approved products
-        const pendingProducts = products.filter((p:any) => !p.isApproved);
-        this.dataSource.data = pendingProducts;
+        this.dataSource.data = products;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
         this.selection.clear();

@@ -47,6 +47,14 @@ export const routes: Routes = [
       {
         path: 'approve-products',
         loadComponent: () => import('./features/approvals/approvals.component').then(m => m.ApprovalsComponent)
+      },
+      {
+        path: 'rental-products',
+        loadComponent: () => import('./features/rental-products/rental-products').then(r => r.RentalProducts)
+      },
+      {
+        path: 'rental-approve-products',
+        loadComponent: () => import('./features/approvals/approvals.component').then(m => m.ApprovalsComponent)
       }
     ]
   },

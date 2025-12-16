@@ -14,6 +14,7 @@
 // }
 export interface Store {
   id: number;
+  businessId: number;
   ownerName: string;
   businessName: string;
   businessEmail: string;

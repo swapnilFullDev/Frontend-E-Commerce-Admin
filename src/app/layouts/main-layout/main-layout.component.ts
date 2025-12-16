@@ -27,7 +27,6 @@ import { AuthUser } from '../../core/models/user.interface';
     MatIconModule,
     MatListModule,
     MatMenuModule,
-    NgIf,
   ],
   templateUrl: "./main-layout.html",
   styleUrls: ["./main-layout.css"]
@@ -35,6 +34,11 @@ import { AuthUser } from '../../core/models/user.interface';
 export class MainLayoutComponent implements OnInit {
   currentUser$: Observable<AuthUser | null>;
   collapsed = false;
+  dropdownStates = {
+    orders: false,
+    products: false,
+    rental: false
+  };
   @ViewChild('drawer') drawer!: MatSidenav;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -59,6 +63,17 @@ export class MainLayoutComponent implements OnInit {
         this.drawer?.open();
       }
     });
+  }
+
+  toggleDropdown(dropdown: keyof typeof this.dropdownStates): void {
+    // Close all other dropdowns
+    Object.keys(this.dropdownStates).forEach(key => {
+      if (key !== dropdown) {
+        this.dropdownStates[key as keyof typeof this.dropdownStates] = false;
+      }
+    });
+    // Toggle the selected dropdown
+    this.dropdownStates[dropdown] = !this.dropdownStates[dropdown];
   }
 
   logout(): void {
