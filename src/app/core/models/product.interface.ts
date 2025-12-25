@@ -1,6 +1,8 @@
 export interface Product {
   id: number;
+  inventoryMasterId:number;
   name: string;
+  productName:string,
   price: number;
   category: string;
   description?: string;

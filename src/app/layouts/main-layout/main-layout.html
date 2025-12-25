@@ -70,15 +70,23 @@
       </a>
       @if(dropdownStates.products && !collapsed){
       <div class="ml-8">
-        <a mat-list-item routerLink="/products" routerLinkActive="active-nav-item">
-          <mat-icon matListItemIcon>assessment</mat-icon>
-          @if(!collapsed){
-          <span matListItemTitle>Products</span>
-          }
-        </a>
         @if (user?.role === "super_admin"){
           <a mat-list-item routerLink="/approve-products" routerLinkActive="active-nav-item" class="text-sm">
-            <span matListItemTitle>Approve Products</span>
+            <mat-icon matListItemIcon>check</mat-icon>
+            <span matListItemTitle>Admin Approve</span>
+          </a>
+        }@else{
+          <a mat-list-item routerLink="/products" routerLinkActive="active-nav-item">
+            <mat-icon matListItemIcon>verified_user</mat-icon>
+            @if(!collapsed){
+            <span matListItemTitle>Verifying Products</span>
+            }
+          </a>
+          <a mat-list-item routerLink="/reject-products" routerLinkActive="active-nav-item">
+            <mat-icon matListItemIcon>cancel</mat-icon>
+            @if(!collapsed){
+            <span matListItemTitle>Rejected Products</span>
+            }
           </a>
         }
       </div>

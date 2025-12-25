@@ -19,6 +19,8 @@ import { Product } from '../../core/models/product.interface';
 import { ProductService } from '../../core/services/product.service';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
+import { CommonUtils } from "../../shared/utils/common.utils";
+import { ProductViewModalComponent } from "../../shared/components/product-view-modal/product-view-modal.component";
 
 @Component({
   selector: 'app-reject-modal',
@@ -77,10 +79,13 @@ export class RejectModalComponent {
   templateUrl: "./approvals.html"
 })
 export class ApprovalsComponent implements OnInit {
-  displayedColumns: string[] = ['select', 'id', 'name', 'price', 'category', 'submittedBy', 'submittedDate', 'status', 'actions'];
+  displayedColumns: string[] = ['select', 'name', 'price', 'category', 'submittedDate', 'status', 'actions'];
   dataSource = new MatTableDataSource<Product>();
   selection = new SelectionModel<Product>(true, []);
   isLoading = true;
+  pageSize = 10;
+  currentPage = 0;
+  totalItems = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -97,10 +102,10 @@ export class ApprovalsComponent implements OnInit {
 
   private loadPendingProducts(): void {
     this.isLoading = true;
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        this.dataSource.data = products;
-        this.dataSource.paginator = this.paginator;
+    this.productService.getProducts(this.currentPage + 1, this.pageSize).subscribe({
+      next: (response) => {
+        this.dataSource.data = response.data;
+        this.totalItems = response.total;
         this.dataSource.sort = this.sort;
         this.selection.clear();
         this.isLoading = false;
@@ -110,6 +115,12 @@ export class ApprovalsComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  onPageChange(event: any): void {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadPendingProducts();
   }
 
   applyFilter(event: Event): void {
@@ -136,7 +147,7 @@ export class ApprovalsComponent implements OnInit {
       width: '400px',
       data: {
         title: 'Approve Product',
-        message: `Are you sure you want to approve "${product.name}"?`,
+        message: `Are you sure you want to approve "${product.productName}" ?`,
         confirmText: 'Approve',
         cancelText: 'Cancel'
       }
@@ -144,7 +155,7 @@ export class ApprovalsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.productService.approveProduct(product.id).subscribe({
+        this.productService.approveProduct(product.inventoryMasterId).subscribe({
           next: () => {
             this.loadPendingProducts();
             this.snackBar.open('Product approved successfully', 'Close', { duration: 3000 });
@@ -178,7 +189,17 @@ export class ApprovalsComponent implements OnInit {
   }
 
   viewProduct(product: Product): void {
-    this.snackBar.open('Product details view would be implemented here', 'Close', { duration: 3000 });
+    let dialogRef = this.dialog.open(ProductViewModalComponent, {
+      width: '80vw',
+      maxWidth: '800px',
+      height: '80vh',
+      maxHeight: '700px',
+      data: product
+    });
+    dialogRef.afterClosed().subscribe({
+      next: (result) => { if(result) this.loadPendingProducts(); },
+      
+    });
   }
 
   bulkApprove(): void {
@@ -231,4 +252,9 @@ export class ApprovalsComponent implements OnInit {
       }
     });
   }
+
+  getVariantSizes = CommonUtils.getVariantSizes;
+  getVariantColour = CommonUtils.getVariantColors;
+  getVariantPrices = CommonUtils.getVariantPrices;
+
 }

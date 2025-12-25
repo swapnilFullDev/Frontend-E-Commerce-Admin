@@ -29,65 +29,14 @@ export class ProductService {
       },
     ];
 
-    const mockProducts: Product[] = [
-      {
-        id: 1,
-        name: "Smartphone",
-        price: 699.99,
-        category: "Electronics",
-        description: "Latest smartphone with advanced features",
-        stock: 50,
-        isApproved: true,
-        createdAt: new Date("2024-01-10"),
-      },
-    ];
+    const mockProducts: Product[] = [];
 
     this.categoriesSubject.next(mockCategories);
     this.productsSubject.next(mockProducts);
   }
 
-  getProducts(): Observable<any> {
-    return this.httpClient.get<any[]>(`${environment.API_URL}${environment.inventoryMiddleWare}/online-products/filter?sizes=&colors=&priceRange=&searchKeyword=&page=1&limit=10`);
-  }
-
-  getCategories(): Observable<ProductCategory[]> {
-    return this.categories$.pipe(delay(300));
-  }
-
-  getPendingProducts(): Observable<Product[]> {
-    return this.products$.pipe(
-      delay(500),
-      map(() => this.productsSubject.value.filter((p) => !p.isApproved))
-    );
-  }
-
-  createProduct(
-    product: Omit<Product, "id" | "createdAt">
-  ): Observable<Product> {
-    const newProduct: Product = {
-      ...product,
-      id: Math.max(...this.productsSubject.value.map((p) => p.id)) + 1,
-      createdAt: new Date(),
-    };
-
-    const currentProducts = this.productsSubject.value;
-    this.productsSubject.next([...currentProducts, newProduct]);
-
-    return of(newProduct).pipe(delay(500));
-  }
-
-  updateProduct(id: number, product: Partial<Product>): Observable<Product> {
-    const currentProducts = this.productsSubject.value;
-    const productIndex = currentProducts.findIndex((p) => p.id === id);
-
-    if (productIndex !== -1) {
-      const updatedProduct = { ...currentProducts[productIndex], ...product };
-      currentProducts[productIndex] = updatedProduct;
-      this.productsSubject.next([...currentProducts]);
-      return of(updatedProduct).pipe(delay(500));
-    }
-
-    throw new Error("Product not found");
+  getProducts(page: number, pageSize: number): Observable<any> {
+    return this.httpClient.get<any[]>(`${environment.API_URL}${environment.inventoryMiddleWare}/online-products/filter?page=${page}&pageSize=${pageSize}`);
   }
 
   deleteProduct(id: number): Observable<boolean> {
@@ -98,8 +47,8 @@ export class ProductService {
     return of(true).pipe(delay(500));
   }
 
-  approveProduct(id: number, comments?: string): Observable<boolean> {
-    return this.updateProduct(id, { isApproved: true }).pipe(map(() => true));
+  approveProduct(id: number) {
+    return this.httpClient.post(`${environment.API_URL}${environment.inventoryMiddleWare}/verify-online/${id}`, {})
   }
 
   rejectProduct(id: number, comments: string): Observable<boolean> {

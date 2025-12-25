@@ -18,13 +18,13 @@ export class InventoryService {
     return this.httpClient.get<InventoryItem>(`${environment.API_URL}${environment.inventoryMiddleWare}/${id}`);
   }
 
-  create(item: InventoryItem): Observable<InventoryItem> {
-    return this.httpClient.post<InventoryItem>(`${environment.API_URL}${environment.inventoryMiddleWare}`, item);
+  create(item: InventoryItem|any): Observable<InventoryItem> {
+    return this.httpClient.post<InventoryItem>(`${environment.API_URL}${environment.inventoryMiddleWare}/create`, item);
   }
 
-  update(id: number, item: InventoryItem): Observable<InventoryItem> {
+  update(id: number, item: InventoryItem | any): Observable<InventoryItem> {
     return this.httpClient.put<InventoryItem>(
-      `${environment.API_URL}${environment.inventoryMiddleWare}/${id}`,
+      `${environment.API_URL}${environment.inventoryMiddleWare}/update/inventoryMasterId/${id}`,
       item
     );
   }
@@ -35,5 +35,13 @@ export class InventoryService {
 
   toggleInventoryItem(inventoryId:number,field:string){
     return this.httpClient.patch(`${environment.API_URL}${environment.inventoryMiddleWare}/toggle/${inventoryId}`,{field:field});
+  }
+
+  toggleInventoryAvailableOnline(inventoryId:number){
+    return this.httpClient.post(`${environment.API_URL}${environment.inventoryMiddleWare}/enable-online/${inventoryId}`,{});
+  }
+  
+  toggleInventoryAvailableRental(inventoryId:number){
+    return this.httpClient.post(`${environment.API_URL}${environment.inventoryMiddleWare}/enable-rental/${inventoryId}`,{});
   }
 }

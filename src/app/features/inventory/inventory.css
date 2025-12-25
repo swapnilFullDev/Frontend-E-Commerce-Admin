@@ -1,0 +1,14 @@
+.status-pending {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+.status-approved {
+  background-color: #d1fae5 !important;
+  color: #065f46 !important;
+}
+
+.status-request {
+  background-color: #e5e7eb !important;
+  color: #374151 !important;
+}

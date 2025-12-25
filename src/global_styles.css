@@ -33,6 +33,14 @@
   --logo-golden-color: #e2b34e;
 }
 
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
+
 /* 🌙 Optional: Dark Mode Variables */
 body.dark-theme {
   --color-bg: #121212;
@@ -81,6 +89,18 @@ body {
 .color-theme-golden-btn{
   background-color: var(--logo-golden-color) !important;
   color: white;
+}
+
+.min-h-modal {
+  min-height: 45vh ;
+}
+.cross-btn-size {
+  height: 20px !important;
+  width: 20px !important;
+}
+
+.mat-mdc-dialog-content {
+    max-height: 100% !important;
 }
 
 /* -------------------------------------------------
