@@ -1,0 +1,4 @@
+.inventory-varients-container {
+  max-height: 365px;
+  overflow-y: auto;
+}

@@ -1,0 +1,134 @@
+<div class="product-modal">
+  <div mat-dialog-title class="modal-header">
+    <h2>{{ data.productName }}</h2>
+    <button mat-icon-button (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-content class="modal-content">
+    <!-- Product Images -->
+    <mat-card class="images-section">
+      <mat-card-header>
+        <mat-card-title>Product Images</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="image-gallery">
+          <img *ngFor="let image of data.imageUrls" 
+               [ngSrc]="image" 
+               width="120" 
+               height="120" 
+               class="product-image"
+               alt="Product image">
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Basic Details -->
+    <mat-card class="details-section">
+      <mat-card-header>
+        <mat-card-title>Product Details</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <strong>SKU Root:</strong> {{ data.skuRoot }}
+          </div>
+          <div class="detail-item">
+            <strong>Category:</strong> {{ data.category }}
+          </div>
+          <div class="detail-item">
+            <strong>Brand:</strong> {{ data.brand }}
+          </div>
+          <div class="detail-item">
+            <strong>Description:</strong> {{ data.description }}
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Status Information -->
+    <mat-card class="status-section">
+      <mat-card-header>
+        <mat-card-title>Status & Availability</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="status-chips">
+          <mat-chip-set>
+            <mat-chip [class]="data.isOnlineAvailable ? 'status-active' : 'status-inactive'">
+              Online: {{ data.isOnlineAvailable ? 'Available' : 'Not Available' }}
+            </mat-chip>
+            <mat-chip [class]="data.isRentalAvailable ? 'status-active' : 'status-inactive'">
+              Rental: {{ data.isRentalAvailable ? 'Available' : 'Not Available' }}
+            </mat-chip>
+            <mat-chip [class]="data.isReturnAcceptable ? 'status-active' : 'status-inactive'">
+              Returns: {{ data.isReturnAcceptable ? 'Acceptable' : 'Not Acceptable' }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+        <div class="verification-status">
+          <p><strong>Online Verification:</strong> {{ data.isVerifyOnlineAvailable ? 'Verified' : 'Pending' }}</p>
+          <p><strong>Rental Verification:</strong> {{ data.isVerifyRentalAvailable ? 'Verified' : 'Pending' }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Variants Table -->
+    <mat-card class="variants-section">
+      <mat-card-header>
+        <mat-card-title>Product Variants</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="data.variants" class="variants-table">
+          <ng-container matColumnDef="size">
+            <th mat-header-cell *matHeaderCellDef>Size</th>
+            <td mat-cell *matCellDef="let variant">{{ variant.size }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="color">
+            <th mat-header-cell *matHeaderCellDef>Color</th>
+            <td mat-cell *matCellDef="let variant">{{ variant.color }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="qty">
+            <th mat-header-cell *matHeaderCellDef>Quantity</th>
+            <td mat-cell *matCellDef="let variant">{{ variant.qty }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="price">
+            <th mat-header-cell *matHeaderCellDef>Price</th>
+            <td mat-cell *matCellDef="let variant">{{ formatCurrency(variant.price) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="rentalPrice">
+            <th mat-header-cell *matHeaderCellDef>Rental Price</th>
+            <td mat-cell *matCellDef="let variant">{{ formatCurrency(variant.rentalPrice) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="advancePrice">
+            <th mat-header-cell *matHeaderCellDef>Advance Price</th>
+            <td mat-cell *matCellDef="let variant">{{ formatCurrency(variant.advancePrice) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="minRental">
+            <th mat-header-cell *matHeaderCellDef>Min Rental</th>
+            <td mat-cell *matCellDef="let variant">{{ variant.minimumDaysRental }}</td>
+          </ng-container>
+
+          <!-- <ng-container matColumnDef="sku">
+            <th mat-header-cell *matHeaderCellDef>SKU</th>
+            <td mat-cell *matCellDef="let variant">{{ variant.sku }}</td>
+          </ng-container> -->
+
+          <tr mat-header-row *matHeaderRowDef="variantColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: variantColumns;"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div mat-dialog-actions class="modal-actions flex justify-around items-center gap-2">
+    <button mat-raised-button color="primary" (click)="approveProduct()">Approve</button>
+    <button mat-raised-button color="warn" (click)="close()">Close</button>
+  </div>
+</div>

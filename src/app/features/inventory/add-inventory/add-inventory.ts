@@ -24,7 +24,8 @@ import {
   
   MatSelectModule,
 } from "@angular/material/select";
-import { MatCheckbox } from "@angular/material/checkbox";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { FormValidationComponent } from "../../../shared/components/form-validation/form-validation.component";
 import { CommonModule } from "@angular/common";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
@@ -33,11 +34,8 @@ import { MatButtonModule } from "@angular/material/button";
 @Component({
   selector: "app-add-inventory",
   imports: [
-    MatCheckbox,
-    MatDialogActions,
     MatFormField,
     MatLabel,
-    MatError,
     ReactiveFormsModule,
     CommonModule,
     MatFormFieldModule,
@@ -47,6 +45,8 @@ import { MatButtonModule } from "@angular/material/button";
     MatButtonModule,
     MatStepperModule,
     MatIconModule,
+    MatCheckboxModule,
+    FormValidationComponent,
   ],
   templateUrl: "./add-inventory.html",
   styleUrl: "./add-inventory.css",
@@ -55,7 +55,7 @@ export class AddInventory implements OnInit {
   inventoryForm!: FormGroup;
   isEdit = false;
   statusOptions = ["Active", "Inactive"];
-  categoryOptions = ["M", "W", "Kids"];
+  categoryOptions = ["Clothing", "Accessories", "Footwear"];
 
   constructor(
     private fb: FormBuilder,
@@ -68,51 +68,34 @@ export class AddInventory implements OnInit {
     this.isEdit = !!this.data;
 
 
-    // Create a multi-step friendly form structure: basicInfo, images (FormArray), sizes (FormArray)
     this.inventoryForm = this.fb.group({
-      basicInfo: this.fb.group({
-        productName: [
-          this.data?.productName || "",
-          [Validators.required, Validators.maxLength(100)],
-        ],
-        availableColour: [this.data?.availableColour || "", Validators.maxLength(100)],
-        prices: [this.data?.prices || 0, [Validators.required, Validators.min(0)]],
-        isReturnAcceptable: [this.data?.isReturnAcceptable || false],
-        isAvailableOnRent: [this.data?.isAvailableOnRent || false],
-        status: [this.data?.status || "Active", Validators.required],
-        category: [this.data?.category || "M", Validators.required],
-        availableOnline: [this.data?.availableOnline ?? true],
-        fabricMaterial: [this.data?.fabricMaterial || "", Validators.maxLength(255)],
-        comboDetails: [this.data?.comboDetails || ""],
-        description: [this.data?.description || ""],
-      }),
-      images: this.fb.array([]),
-      sizes: this.fb.array([]),
+      productName: [
+        this.data?.productName || "",
+        [Validators.required, Validators.maxLength(100)],
+      ],
+      description: [this.data?.description || "", [Validators.required, Validators.maxLength(100)]],
+      category: [this.data?.category || "Clothing", Validators.required],
+      brand: [this.data?.brand || "", Validators.required],
+      isReturnAcceptable: [Boolean(this.data?.isReturnAcceptable) || false],
+      images: this.fb.array([], [Validators.required, Validators.minLength(1), Validators.maxLength(5)]),
+      variants: this.fb.array([], [Validators.required, Validators.minLength(1), Validators.maxLength(10)]),
     });
 
-    // Prepopulate images if provided (supports array or JSON string)
-    const imagesRaw = (this.data as any)?.productImages;
-    if (imagesRaw) {
-      try {
-        const imgs = Array.isArray(imagesRaw) ? imagesRaw : JSON.parse(imagesRaw);
-        if (Array.isArray(imgs)) {
-          imgs.forEach((it: any) => {
-            if (typeof it === 'string') {
-              this.images.push(this.fb.group({ url: it, fileName: '', preview: it }));
-            } else if (it && it.url) {
-              this.images.push(this.fb.group({ url: it.url, fileName: it.fileName || '', preview: it.url }));
-            }
-          });
-        }
-      } catch (e) {
-        // ignore parse errors
-      }
+    // Prepopulate images if provided
+    console.log(this.data);
+    const imagesRaw = (this.data as any)?.imageUrls;
+    if (imagesRaw && Array.isArray(imagesRaw)) {
+      imagesRaw.forEach((img: any) => {
+        this.images.push(this.fb.group({ file: null, preview: img, url: img }));
+      });
     }
 
-    // Prepopulate sizes if provided
-    const sizesRaw = (this.data as any)?.sizes;
-    if (sizesRaw && Array.isArray(sizesRaw)) {
-      sizesRaw.forEach((s: any) => this.sizes.push(this.fb.group({ size: s.size, quantity: s.quantity })));
+    // Prepopulate variants if provided
+    const variantsRaw = (this.data as any)?.variants;
+    if (variantsRaw && Array.isArray(variantsRaw)) {
+      variantsRaw.forEach((v: any) => this.variants.push(this.createVariantGroup(v)));
+    }else{
+      this.addVariant();
     }
   }
 
@@ -121,12 +104,21 @@ export class AddInventory implements OnInit {
     return this.inventoryForm.get('images') as FormArray;
   }
 
-  get sizes(): FormArray {
-    return this.inventoryForm.get('sizes') as FormArray;
+  get variants(): FormArray {
+    return this.inventoryForm.get('variants') as FormArray;
   }
 
-  get basicInfo(): FormGroup {
-    return this.inventoryForm.get('basicInfo') as FormGroup;
+  createVariantGroup(variant?: any): FormGroup {
+    return this.fb.group({
+      id: [variant?.variantId || null],
+      size: [variant?.size || '', Validators.required],
+      color: [variant?.color || '', Validators.required],
+      qty: [variant?.qty || 0, [Validators.required, Validators.min(1)]],
+      price: [variant?.price || 0, [Validators.required, Validators.min(1)]],
+      rentalPrice: [variant?.rentalPrice || 0, [Validators.required, Validators.min(1)]],
+      advancePrice: [variant?.advancePrice || 0, [Validators.required, Validators.min(1)]],
+      minimumDaysRental: [variant?.minimumDaysRental || '', Validators.required],
+    });
   }
 
   // File selection handling
@@ -134,61 +126,103 @@ export class AddInventory implements OnInit {
     const input = event.target as HTMLInputElement;
     if (!input.files) return;
     Array.from(input.files).forEach((file) => {
+      if (this.images.length >= 5) return;
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.images.push(
-          this.fb.group({ url: '', fileName: file.name, file: file, preview: e.target.result })
+          this.fb.group({ file: file, preview: e.target.result, url: null })
         );
       };
       reader.readAsDataURL(file);
     });
-    // reset input value so selecting same file again triggers change
     input.value = '';
   }
 
-  addImageUrl(url: string) {
-    if (!url) return;
-    this.images.push(this.fb.group({ url, fileName: '', preview: url }));
-  }
-
   removeImage(index: number) {
-    this.images.removeAt(index);
+    if (this.images.length > 1) {
+      this.images.removeAt(index);
+    }
   }
 
-  // Sizes handling
-  addSize() {
-    this.sizes.push(this.fb.group({ size: '', quantity: 0 }));
+  // Variants handling
+  addVariant() {
+    if (this.variants.length < 10) {
+      this.variants.push(this.createVariantGroup());
+    }
   }
 
-  removeSize(index: number) {
-    this.sizes.removeAt(index);
+  removeVariant(index: number) {
+    if (this.variants.length > 1) {
+      this.variants.removeAt(index);
+    }
+  }
+
+  get canAddImage(): boolean {
+    return this.images.length < 5;
+  }
+
+  get canRemoveImage(): boolean {
+    return this.images.length > 1;
+  }
+
+  get canAddVariant(): boolean {
+    return this.variants.length < 10;
+  }
+
+  get canRemoveVariant(): boolean {
+    return this.variants.length > 1;
   }
 
   // Finalize form and submit
   finishAndSubmit() {
-    // Merge basicInfo + images + sizes into payload
+    console.log(this.inventoryForm.value);
     if (this.inventoryForm.invalid) return;
-    const basic = this.inventoryForm.get('basicInfo')?.value || {};
-    const imagesPayload = this.images.controls.map((c: any) => {
-      const v: any = c.value;
-      return { url: v.url || '', fileName: v.fileName || '', preview: v.preview || '' };
+    
+    const formData = new FormData();
+    
+    // Add basic fields
+    formData.append('productName', this.inventoryForm.get('productName')?.value || '');
+    formData.append('description', this.inventoryForm.get('description')?.value || '');
+    formData.append('category', this.inventoryForm.get('category')?.value || '');
+    formData.append('brand', this.inventoryForm.get('brand')?.value || '');
+    formData.append('isReturnAcceptable', this.inventoryForm.get('isReturnAcceptable')?.value || 'false');
+    
+    // Add images - both existing URLs and new files
+    this.images.controls.forEach((control: any) => {
+      const file = control.get('file')?.value;
+      const url = control.get('url')?.value;
+      
+      if (file) {
+        // New image file
+        formData.append('images', file);
+      } else if (url) {
+        // Existing image URL
+        formData.append('images', url);
+      }
     });
-    const sizesPayload = this.sizes.controls.map((c: any) => c.value);
+    
+    // Add variants
+    this.variants.controls.forEach((control: any, index: number) => {
+      const variant = control.value;
+      if (variant.id) {
+        formData.append(`variants[${index}][variantId]`, variant.id.toString());
+      }
+      formData.append(`variants[${index}][size]`, variant.size);
+      formData.append(`variants[${index}][color]`, variant.color);
+      formData.append(`variants[${index}][qty]`, variant.qty.toString());
+      formData.append(`variants[${index}][price]`, variant.price.toString());
+      formData.append(`variants[${index}][rentalPrice]`, variant.rentalPrice.toString());
+      formData.append(`variants[${index}][advancePrice]`, variant.advancePrice.toString());
+      formData.append(`variants[${index}][minimumDaysRental]`, variant.minimumDaysRental);
+    });
 
-    const payload = {
-      ...basic,
-      productImages: imagesPayload,
-      sizes: sizesPayload,
-    } as any;
-
-    // call existing create/update paths but with new payload
-    if (this.isEdit && this.data?.iD) {
-      this.inventoryService.update(this.data.iD, payload).subscribe({
-        next: () => this.dialogRef.close('saved'),
+    if (this.isEdit && this.data?.inventoryMasterId) {
+      this.inventoryService.update(this.data.inventoryMasterId, formData).subscribe({
+        next: () => this.dialogRef.close(`saved`),
         error: () => alert('Failed to update item'),
       });
     } else {
-      this.inventoryService.create(payload).subscribe({
+      this.inventoryService.create(formData).subscribe({
         next: () => this.dialogRef.close('saved'),
         error: () => alert('Failed to create item'),
       });
@@ -196,23 +230,7 @@ export class AddInventory implements OnInit {
   }
 
   onSubmit() {
-    if (this.inventoryForm.invalid) {
-      return;
-    }
-
-    const inventoryData: InventoryItem = this.inventoryForm.value;
-
-    if (this.isEdit && this.data?.iD) {
-      this.inventoryService.update(this.data.iD, inventoryData).subscribe({
-        next: () => this.dialogRef.close("saved"),
-        error: () => alert("Failed to update item"),
-      });
-    } else {
-      this.inventoryService.create(inventoryData).subscribe({
-        next: () => this.dialogRef.close("saved"),
-        error: () => alert("Failed to create item"),
-      });
-    }
+    this.finishAndSubmit();
   }
 
   onCancel() {

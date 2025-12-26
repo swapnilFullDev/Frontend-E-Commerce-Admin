@@ -29,18 +29,7 @@ export class RentalProductService {
       },
     ];
 
-    const mockProducts: Product[] = [
-      {
-        id: 1,
-        name: "Smartphone",
-        price: 699.99,
-        category: "Electronics",
-        description: "Latest smartphone with advanced features",
-        stock: 50,
-        isApproved: true,
-        createdAt: new Date("2024-01-10"),
-      },
-    ];
+    const mockProducts: Product[] = [];
 
     this.categoriesSubject.next(mockCategories);
     this.productsSubject.next(mockProducts);

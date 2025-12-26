@@ -1,7 +1,8 @@
 export interface InventoryItem {
   iD?: number;
   productName: string;
-  // businessId: number;
+  brand: string;
+  inventoryMasterId: number;
   availableSizes?: string;
   availableColour?: string;
   prices: number;

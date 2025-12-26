@@ -18,6 +18,9 @@ import { MatChipsModule } from "@angular/material/chips";
 import { LoadingComponent } from "../../shared/components/loading/loading.component";
 import { NgOptimizedImage } from '@angular/common'
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { MatSelectModule } from "@angular/material/select";
+import { CommonUtils } from "../../shared/utils/common.utils";
+
 @Component({
   selector: "app-inventory",
   imports: [
@@ -36,6 +39,7 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
     MatChipsModule,
     LoadingComponent,
     MatSlideToggleModule,
+    MatSelectModule
   ],
   templateUrl: "./inventory.html",
   styleUrl: "./inventory.css",
@@ -56,6 +60,7 @@ export class Inventory {
   ];
   dataSource = new MatTableDataSource<InventoryItem>([]);
   isLoading = false;
+  totalItems = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -73,9 +78,15 @@ export class Inventory {
   loadInventory() {
     this.isLoading = true;
     this.inventoryService.getAll().subscribe({
-      next: (items: any) => {
-        this.dataSource.data = items.data;
-        this.dataSource.paginator = this.paginator;
+      next: (response: any) => {
+        // Pre-compute status values to avoid function calls in template
+        this.dataSource.data = response.data.map((item: any) => ({
+          ...item,
+          rentStatus: this.computeRentStatus(item),
+          onlineStatus: this.computeOnlineStatus(item),
+          statusClass: this.computeStatusClass(item)
+        }));
+        this.totalItems = response.total;
         this.dataSource.sort = this.sort;
         this.isLoading = false;
       },
@@ -97,7 +108,9 @@ export class Inventory {
 
   openDialog(item?: InventoryItem) {
     const dialogRef = this.dialog.open(AddInventory, {
-      width: "600px",
+      width: "700px",
+      height: "625px",
+      maxHeight: "100%",
       data: item ? { ...item } : null,
     });
 
@@ -134,16 +147,49 @@ export class Inventory {
     });
   }
 
-  onRentToggleChange(invId: number, checked: boolean, type: string): void {
-    console.log("Rent availability changed:", checked);
-
-    // Example: call service method
-    this.inventoryService.toggleInventoryItem(invId, type).subscribe({
+  onRentToggleChange(invId: number, productName: string): void {
+    this.inventoryService.toggleInventoryAvailableRental(invId).subscribe({
       next: () => {
-        this.snackBar.open(`Inventory ${type} updated`, "Close", {
+        this.snackBar.open(`Inventory ${productName} requested for available rental online`, "Close", {
           duration: 3000,
         });
         this.loadInventory();
+      },
+      error: () => {
+        this.snackBar.open(`Failed to request inventory ${productName}`, "Close", {
+          duration: 3000,
+        });
+      },
+    });
+  }
+
+  onOnlineToggleChange(invId: number, productName:string): void {
+    this.inventoryService.toggleInventoryAvailableOnline(invId).subscribe({
+      next: () => {
+        const snackBarRef = this.snackBar.open(`Inventory ${productName} requested to be available online listing`, "Close", {
+          duration: 3000,
+        });
+        snackBarRef.afterDismissed().subscribe(() => {
+          this.loadInventory();
+        });
+      },
+      error: () => {
+        this.snackBar.open(`Failed to request inventory ${productName} for online lisitng`, "Close", {
+          duration: 3000,
+        });
+      },
+    });
+  }
+
+  onStatusToggleChange(invId: number, checked: boolean, type: string): void {
+    this.inventoryService.toggleInventoryItem(invId, type).subscribe({
+      next: () => {
+        const snackBarRef = this.snackBar.open(`Inventory ${type} updated`, "Close", {
+          duration: 3000,
+        });
+        snackBarRef.afterDismissed().subscribe(() => {
+          this.loadInventory();
+        });
       },
       error: () => {
         this.snackBar.open(`Failed to update inventory ${type}`, "Close", {
@@ -151,5 +197,39 @@ export class Inventory {
         });
       },
     });
+  }
+
+  getVariantSizes = CommonUtils.getVariantSizes;
+  getVariantColour = CommonUtils.getVariantColors;
+  getVariantPrices = CommonUtils.getVariantPrices;
+
+  private computeRentStatus(element: any): string {
+    if (element.isRentalAvailable == false && element.isVerifyRentalAvailable == false) {
+      return 'Request';
+    } else if (element.isRentalAvailable == true && element.isVerifyRentalAvailable == false) {
+      return 'Pending';
+    } else {
+      return 'Approved';
+    }
+  }
+
+  private computeOnlineStatus(element: any): string {
+    if (element.isOnlineAvailable == false && element.isVerifyOnlineAvailable == false) {
+      return 'Request';
+    } else if (element.isOnlineAvailable == true && element.isVerifyOnlineAvailable == false) {
+      return 'Pending';
+    } else {
+      return 'Approved';
+    }
+  }
+
+  private computeStatusClass(element: any): string {
+    const status = this.computeRentStatus(element);
+    if (status === 'Pending') {
+      return 'status-pending';
+    } else if (status === 'Approved') {
+      return 'status-approved';
+    }
+    return 'status-request';
   }
 }

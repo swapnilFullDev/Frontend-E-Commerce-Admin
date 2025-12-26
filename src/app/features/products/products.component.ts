@@ -39,9 +39,12 @@ import { AddProduct } from './add-product/add-product';
   templateUrl: "./products.html"
 })
 export class ProductsComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'name', 'price', 'category', 'stock', 'status', 'actions'];
+  displayedColumns: string[] = ['name', 'price', 'category', 'stock', 'status', 'actions'];
   dataSource = new MatTableDataSource<any>();
   isLoading = true;
+  pageSize = 10;
+  currentPage = 0;
+  totalItems = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -58,11 +61,10 @@ export class ProductsComponent implements OnInit {
 
   private loadProducts(): void {
     this.isLoading = true;
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        console.log(products);
-        this.dataSource.data = products;
-        this.dataSource.paginator = this.paginator;
+    this.productService.getProducts(this.currentPage + 1, this.pageSize).subscribe({
+      next: (response) => {
+        this.dataSource.data = response.data;
+        this.totalItems = response.total;
         this.dataSource.sort = this.sort;
         this.isLoading = false;
       },
@@ -71,6 +73,12 @@ export class ProductsComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  onPageChange(event: any): void {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.loadProducts();
   }
 
   applyFilter(event: Event): void {
@@ -116,5 +124,9 @@ export class ProductsComponent implements OnInit {
         });
       }
     });
+  }
+
+  getProductPrices(variants: any[]): string {
+    return variants?.map(v => `₹${v.price}`).join(', ') || '₹0';
   }
 }
