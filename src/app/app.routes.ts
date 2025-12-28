@@ -3,16 +3,13 @@ import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  {
-    path: 'login',
+  { path: 'login',
     loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
   },
-  {
-    path: 'signup',
+  { path: 'signup',
     loadComponent: () => import('./features/signup/signup').then(s => s.Signup)
   },
-  {
-    path: '',
+  { path: '',
     loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
     canActivate: [authGuard],
     children: [
@@ -40,6 +37,9 @@ export const routes: Routes = [
           { path: 'approve-products',
             loadComponent: () => import('./features/products/approvals/approvals.component').then(m => m.ApprovalsComponent)
           },
+          { path: 'reject-products',
+            loadComponent: () => import('./features/products/online-reject/online-reject').then(m => m.OnlineReject)
+          },
         ]
       },
       { path: 'rental-products',
@@ -47,6 +47,9 @@ export const routes: Routes = [
         children: [
           { path: 'rental-approve-products',
             loadComponent: () => import('./features/rental-products/rental-approvals/approvals.component').then(m => m.RentalApprovalsComponent)
+          },
+          { path: 'rental-reject-products',
+            loadComponent: () => import('./features/rental-products/rental-reject/rental-reject').then(m => m.RentalReject)
           }
         ]
       },

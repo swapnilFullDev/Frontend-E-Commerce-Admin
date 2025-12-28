@@ -92,9 +92,9 @@ export class RentalProducts implements AfterViewInit {
     this.rentalProductService.getOnlineVerifiedProducts(this.currentPage, this.pageSize).subscribe({
       next: (response) => {
         this.dataSource.data = response.data || [];
-        this.totalItems = parseInt(response.totalItems) || 0;
-        this.totalPages = parseInt(response.totalPages) || 0;
-        this.currentPage = parseInt(response.currentPage) || 1;
+        this.totalItems = response.pagination.totalItems;
+        this.totalPages = response.pagination.totalPages;
+        this.currentPage = response.pagination.currentPage;
         
         if (this.paginator) {
           this.paginator.length = this.totalItems;

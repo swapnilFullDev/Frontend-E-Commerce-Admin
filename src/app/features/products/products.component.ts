@@ -79,7 +79,7 @@ export class ProductsComponent implements OnInit {
     this.productService.getOnlineVerifiedProducts(this.currentPage + 1, this.pageSize).subscribe({
       next: (response) => {
         this.dataSource.data = response.data;
-        this.totalItems = response.total;
+        this.totalItems = response.pagination.totalItems;
         this.dataSource.sort = this.sort;
         this.isLoading = false;
       },
