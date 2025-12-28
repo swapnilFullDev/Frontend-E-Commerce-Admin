@@ -58,4 +58,14 @@ export class AuthService {
       storeData
     );
   }
+
+  getBusinessDetailsById(id: string) {
+    return this.httpClient.get(
+      `${this.baseUrl}${environment.businessMiddleWare}/${id}`
+    );
+  }
+
+  updateProfile(businessId: number, updateData: any) {
+    return this.httpClient.put(`${this.baseUrl}${environment.businessMiddleWare}/businessId/${businessId}`, updateData);
+  }
 }

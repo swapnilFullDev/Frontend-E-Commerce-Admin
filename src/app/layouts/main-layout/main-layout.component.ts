@@ -7,12 +7,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { AuthUser } from '../../core/models/user.interface';
+import { ProfileModalComponent } from '../../features/signup/profile-modal/profile-modal.component';
 
 @Component({
   selector: 'app-main-layout',
@@ -50,7 +52,8 @@ export class MainLayoutComponent implements OnInit {
   constructor(
     private breakpointObserver: BreakpointObserver,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) {
     this.currentUser$ = this.authService.currentUser$;    
   }
@@ -79,5 +82,20 @@ export class MainLayoutComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  openProfile(): void {
+    this.currentUser$.subscribe(user => {
+      console.log(user);
+      
+      this.dialog.open(ProfileModalComponent, {
+        width: '800px',
+        maxHeight: '90vh',
+        data: {
+          isEdit: true,
+          userData: user
+        }
+      });
+    });
   }
 }
