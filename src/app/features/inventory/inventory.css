@@ -1,14 +1,19 @@
-.status-pending {
+.Pending {
   background-color: #fef3c7 !important;
   color: #92400e !important;
 }
 
-.status-approved {
+.Approved {
   background-color: #d1fae5 !important;
   color: #065f46 !important;
 }
 
-.status-request {
+.Request {
   background-color: #e5e7eb !important;
   color: #374151 !important;
+}
+
+.Rejected {
+  background-color: #fecaca !important;
+  color: #991b1b !important;
 }

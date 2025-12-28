@@ -58,7 +58,7 @@ export class MainLayoutComponent implements OnInit {
   ngOnInit(): void {
     this.isHandset$.subscribe(isHandset => {
       if (isHandset) {
-        this.drawer.close();
+        this.drawer?.close();
       } else {
         this.drawer?.open();
       }

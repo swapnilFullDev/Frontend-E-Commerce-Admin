@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatPaginatorModule, MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,7 +16,8 @@ import { Product } from '../../core/models/product.interface';
 import { RentalProductService } from '../../core/services/rentalProduct.service';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
-// import { AddRentalProducts } from './add-rental-products/add-rental-products';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-rental-products',
@@ -33,15 +34,23 @@ import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/c
     MatSnackBarModule,
     MatCardModule,
     MatChipsModule,
-    LoadingComponent
+    LoadingComponent,
+    RouterOutlet
   ],
   templateUrl: './rental-products.html',
   styleUrl: './rental-products.css'
 })
-export class RentalProducts {
-  displayedColumns: string[] = ['id', 'name', 'price', 'category', 'stock', 'status', 'actions'];
+export class RentalProducts implements AfterViewInit {
+  displayedColumns: string[] = ['name', 'price', 'category', 'stock', 'status', 'actions'];
   dataSource = new MatTableDataSource<Product>();
   isLoading = true;
+  hasActiveChildRoute = false;
+  
+  // Pagination properties
+  currentPage = 1;
+  pageSize = 10;
+  totalItems = 0;
+  totalPages = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -49,20 +58,50 @@ export class RentalProducts {
   constructor(
     private rentalProductService: RentalProductService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadProducts();
+    this.checkActiveRoute();
+    
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.checkActiveRoute();
+    });
+  }
+
+  ngAfterViewInit(): void {
+    if (this.paginator) {
+      this.paginator.page.subscribe((event: PageEvent) => {
+        this.currentPage = event.pageIndex + 1;
+        this.pageSize = event.pageSize;
+        this.loadProducts();
+      });
+    }
+  }
+
+  private checkActiveRoute(): void {
+    this.hasActiveChildRoute = this.router.url !== '/rental-products';
   }
 
   private loadProducts(): void {
     this.isLoading = true;
-    this.rentalProductService.getRentalProducts().subscribe({
-      next: (rentalProducts) => {
-        console.log(rentalProducts);
-        this.dataSource.data = rentalProducts;
-        this.dataSource.paginator = this.paginator;
+    this.rentalProductService.getOnlineVerifiedProducts(this.currentPage, this.pageSize).subscribe({
+      next: (response) => {
+        this.dataSource.data = response.data || [];
+        this.totalItems = parseInt(response.totalItems) || 0;
+        this.totalPages = parseInt(response.totalPages) || 0;
+        this.currentPage = parseInt(response.currentPage) || 1;
+        
+        if (this.paginator) {
+          this.paginator.length = this.totalItems;
+          this.paginator.pageIndex = this.currentPage - 1;
+          this.paginator.pageSize = parseInt(response.itemsPerPage) || this.pageSize;
+        }
+        
         this.dataSource.sort = this.sort;
         this.isLoading = false;
       },
@@ -105,7 +144,7 @@ export class RentalProducts {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.rentalProductService.deleteProduct(product.id).subscribe({
+        this.rentalProductService.deleteRentalProduct(product.id).subscribe({
           next: () => {
             this.loadProducts();
             this.snackBar.open('Product deleted successfully', 'Close', { duration: 3000 });
@@ -116,5 +155,13 @@ export class RentalProducts {
         });
       }
     });
+  }
+
+  getProductPrices(variants: any[]): string {
+    return variants?.map(v => `₹${v.price}`).join(', ') || '₹0';
+  }
+
+  getStockData(variants: any[]) {
+    return variants?.map(v => `Size-${v.size} : ${v.qty} Qty`).join(', ');
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, OnDestroy } from "@angular/core";
 import { InventoryService } from "../../core/services/inventory.service";
 import { InventoryItem } from "../../core/models/inventory.interface";
 import { MatTableDataSource, MatTableModule } from "@angular/material/table";
@@ -20,6 +20,7 @@ import { NgOptimizedImage } from '@angular/common'
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatSelectModule } from "@angular/material/select";
 import { CommonUtils } from "../../shared/utils/common.utils";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-inventory",
@@ -44,7 +45,7 @@ import { CommonUtils } from "../../shared/utils/common.utils";
   templateUrl: "./inventory.html",
   styleUrl: "./inventory.css",
 })
-export class Inventory {
+export class Inventory implements OnInit, OnDestroy {
   displayedColumns: string[] = [
     "productImages",
     "productName",
@@ -68,11 +69,17 @@ export class Inventory {
   constructor(
     private inventoryService: InventoryService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadInventory();
+  }
+
+  ngOnDestroy(): void {
+    // Clear data when leaving component
+    this.dataSource.data = [];
   }
 
   loadInventory() {
@@ -83,8 +90,7 @@ export class Inventory {
         this.dataSource.data = response.data.map((item: any) => ({
           ...item,
           rentStatus: this.computeRentStatus(item),
-          onlineStatus: this.computeOnlineStatus(item),
-          statusClass: this.computeStatusClass(item)
+          onlineStatus: this.computeOnlineStatus(item)
         }));
         this.totalItems = response.total;
         this.dataSource.sort = this.sort;
@@ -206,8 +212,10 @@ export class Inventory {
   private computeRentStatus(element: any): string {
     if (element.isRentalAvailable == false && element.isVerifyRentalAvailable == false) {
       return 'Request';
-    } else if (element.isRentalAvailable == true && element.isVerifyRentalAvailable == false) {
+    } else if (element.isRentalAvailable == true && element.isVerifyRentalAvailable == false && element.isReject == false) {
       return 'Pending';
+    } else if(element.isRentalAvailable == true && element.isReject == true){
+      return 'Rejected';
     } else {
       return 'Approved';
     }
@@ -216,20 +224,13 @@ export class Inventory {
   private computeOnlineStatus(element: any): string {
     if (element.isOnlineAvailable == false && element.isVerifyOnlineAvailable == false) {
       return 'Request';
-    } else if (element.isOnlineAvailable == true && element.isVerifyOnlineAvailable == false) {
+    } else if (element.isOnlineAvailable == true && element.isVerifyOnlineAvailable == false && element.isReject == false) {
       return 'Pending';
+    } else if(element.isOnlineAvailable == true && element.isReject == true){
+      return 'Rejected';
     } else {
       return 'Approved';
     }
   }
 
-  private computeStatusClass(element: any): string {
-    const status = this.computeRentStatus(element);
-    if (status === 'Pending') {
-      return 'status-pending';
-    } else if (status === 'Approved') {
-      return 'status-approved';
-    }
-    return 'status-request';
-  }
 }

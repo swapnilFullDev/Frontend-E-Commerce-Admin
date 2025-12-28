@@ -16,82 +16,30 @@ export class RentalProductService {
   private categoriesSubject = new BehaviorSubject<ProductCategory[]>([]);
   public categories$ = this.categoriesSubject.asObservable();
 
-  constructor() {
-    this.loadMockData();
+  constructor() { }
+
+
+  getRentalProducts(page: number = 1, limit: number = 10): Observable<any> {
+    return this.httpClient.get<any>(`${environment.API_URL}${environment.inventoryMiddleWare}/online-rentals/filter?page=${page}&limit=${limit}`);
   }
 
-  private loadMockData(): void {
-    const mockCategories: ProductCategory[] = [
-      {
-        id: 1,
-        name: "Electronics",
-        description: "Electronic devices and accessories",
-      },
-    ];
-
-    const mockProducts: Product[] = [];
-
-    this.categoriesSubject.next(mockCategories);
-    this.productsSubject.next(mockProducts);
+  getOnlineVerifiedProducts(page: number, pageSize: number): Observable<any> {
+    return this.httpClient.get(`${environment.API_URL}${environment.inventoryMiddleWare}/get/rental/verified`);
   }
 
-  getRentalProducts(): Observable<any> {
-    return this.httpClient.get<any[]>(`${environment.API_URL}${environment.inventoryMiddleWare}/online-rentals/filter?sizes=L&rentalPriceRange=0-50&page=1&limit=10`);
+  deleteRentalProduct(id: number) {
+    return this.httpClient.delete(`${environment.API_URL}${environment.inventoryMiddleWare}/rental/${id}`);
   }
 
-  getCategories(): Observable<ProductCategory[]> {
-    return this.categories$.pipe(delay(300));
+  getPendingProducts(page: number, limit: number): Observable<any> {
+    return this.httpClient.get(`${environment.API_URL}${environment.inventoryMiddleWare}/online-rentals/filter?page=${page}&limit=${limit}`);
   }
 
-  getPendingProducts(): Observable<Product[]> {
-    return this.products$.pipe(
-      delay(500),
-      map(() => this.productsSubject.value.filter((p) => !p.isApproved))
-    );
-  }
+  approveRentalProduct(id: number) { 
+    return this.httpClient.post(`${environment.API_URL}${environment.inventoryMiddleWare}/verify-rental/${id}`, { });
+   }
 
-  createProduct(
-    product: Omit<Product, "id" | "createdAt">
-  ): Observable<Product> {
-    const newProduct: Product = {
-      ...product,
-      id: Math.max(...this.productsSubject.value.map((p) => p.id)) + 1,
-      createdAt: new Date(),
-    };
-
-    const currentProducts = this.productsSubject.value;
-    this.productsSubject.next([...currentProducts, newProduct]);
-
-    return of(newProduct).pipe(delay(500));
-  }
-
-  updateProduct(id: number, product: Partial<Product>): Observable<Product> {
-    const currentProducts = this.productsSubject.value;
-    const productIndex = currentProducts.findIndex((p) => p.id === id);
-
-    if (productIndex !== -1) {
-      const updatedProduct = { ...currentProducts[productIndex], ...product };
-      currentProducts[productIndex] = updatedProduct;
-      this.productsSubject.next([...currentProducts]);
-      return of(updatedProduct).pipe(delay(500));
-    }
-
-    throw new Error("Product not found");
-  }
-
-  deleteProduct(id: number): Observable<boolean> {
-    const currentProducts = this.productsSubject.value;
-    const filteredProducts = currentProducts.filter((p) => p.id !== id);
-    this.productsSubject.next(filteredProducts);
-
-    return of(true).pipe(delay(500));
-  }
-
-  approveProduct(id: number, comments?: string): Observable<boolean> {
-    return this.updateProduct(id, { isApproved: true }).pipe(map(() => true));
-  }
-
-  rejectProduct(id: number, comments: string): Observable<boolean> {
-    return this.deleteProduct(id);
+  rejectRentalProduct(id: number, remark: string) { 
+    return this.httpClient.put(`${environment.API_URL}${environment.inventoryMiddleWare}/reject/inventoryMasterId/${id}`, { remark });
   }
 }

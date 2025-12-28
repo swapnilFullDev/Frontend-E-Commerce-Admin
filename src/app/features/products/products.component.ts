@@ -16,7 +16,8 @@ import { Product } from '../../core/models/product.interface';
 import { ProductService } from '../../core/services/product.service';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
-import { AddProduct } from './add-product/add-product';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-products',
@@ -34,7 +35,8 @@ import { AddProduct } from './add-product/add-product';
     MatSnackBarModule,
     MatCardModule,
     MatChipsModule,
-    LoadingComponent
+    LoadingComponent,
+    RouterOutlet
   ],
   templateUrl: "./products.html"
 })
@@ -45,6 +47,7 @@ export class ProductsComponent implements OnInit {
   pageSize = 10;
   currentPage = 0;
   totalItems = 0;
+  hasActiveChildRoute = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -52,16 +55,28 @@ export class ProductsComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadProducts();
+    this.checkActiveRoute();
+    
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.checkActiveRoute();
+    });
+  }
+
+  private checkActiveRoute(): void {
+    this.hasActiveChildRoute = this.router.url !== '/products';
   }
 
   private loadProducts(): void {
     this.isLoading = true;
-    this.productService.getProducts(this.currentPage + 1, this.pageSize).subscribe({
+    this.productService.getOnlineVerifiedProducts(this.currentPage + 1, this.pageSize).subscribe({
       next: (response) => {
         this.dataSource.data = response.data;
         this.totalItems = response.total;
@@ -86,19 +101,18 @@ export class ProductsComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  openProductModal(product?: Product): void {
-    const dialogRef = this.dialog.open(AddProduct, {
-      width: '600px',
-      data: product || null
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadProducts();
-        this.snackBar.open(product ? 'Product updated successfully' : 'Product created successfully', 'Close', { duration: 3000 });
-      }
-    });
-  }
+  // openProductModal(product?: Product): void {
+  //   const dialogRef = this.dialog.open(AddProduct, {
+  //     width: '600px',
+  //     data: product || null
+  //   });
+  //   dialogRef.afterClosed().subscribe(result => {
+  //     if (result) {
+  //       this.loadProducts();
+  //       this.snackBar.open(product ? 'Product updated successfully' : 'Product created successfully', 'Close', { duration: 3000 });
+  //     }
+  //   });
+  // }
 
   deleteProduct(product: Product): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -128,5 +142,9 @@ export class ProductsComponent implements OnInit {
 
   getProductPrices(variants: any[]): string {
     return variants?.map(v => `₹${v.price}`).join(', ') || '₹0';
+  }
+
+  getStockData(variants: any[]) {
+    return variants?.map(v => `Size - ${v.size} : ${v.qty} Qty`).join(', ');
   }
 }

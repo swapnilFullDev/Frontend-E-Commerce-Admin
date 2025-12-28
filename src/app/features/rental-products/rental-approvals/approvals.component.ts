@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
@@ -8,19 +8,19 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatDialogModule, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { SelectionModel } from '@angular/cdk/collections';
 
-import { Product } from '../../core/models/product.interface';
-import { ProductService } from '../../core/services/product.service';
-import { LoadingComponent } from '../../shared/components/loading/loading.component';
-import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
-import { CommonUtils } from "../../shared/utils/common.utils";
-import { ProductViewModalComponent } from "../../shared/components/product-view-modal/product-view-modal.component";
+import { Product } from '../../../core/models/product.interface';
+import { RentalProductService } from '../../../core/services/rentalProduct.service';
+import { LoadingComponent } from '../../../shared/components/loading/loading.component';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { CommonUtils } from "../../../shared/utils/common.utils";
+import { ProductViewModalComponent } from "../../../shared/components/product-view-modal/product-view-modal.component";
 
 @Component({
   selector: 'app-reject-modal',
@@ -41,7 +41,9 @@ export class RejectModalComponent {
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialog
+    private dialogRef: MatDialog,
+    private rentalProductService: RentalProductService,
+    @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.rejectForm = this.fb.group({
       comments: ['']
@@ -50,10 +52,15 @@ export class RejectModalComponent {
 
   onReject(): void {
     this.isLoading = true;
-    setTimeout(() => {
-      this.dialogRef.closeAll();
-      this.isLoading = false;
-    }, 1000);
+    this.rentalProductService.rejectRentalProduct(this.data.inventoryMasterId, this.rejectForm.get('remark')?.value || '').subscribe({
+      next: () => {
+        this.dialogRef.closeAll();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        // Handle error if needed
+      }
+    });
   }
 }
 
@@ -78,7 +85,7 @@ export class RejectModalComponent {
   ],
   templateUrl: "./approvals.html"
 })
-export class ApprovalsComponent implements OnInit {
+export class RentalApprovalsComponent implements OnInit {
   displayedColumns: string[] = ['select', 'name', 'price', 'category', 'submittedDate', 'status', 'actions'];
   dataSource = new MatTableDataSource<Product>();
   selection = new SelectionModel<Product>(true, []);
@@ -91,7 +98,7 @@ export class ApprovalsComponent implements OnInit {
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
-    private productService: ProductService,
+    private rentalProductService: RentalProductService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
@@ -102,7 +109,7 @@ export class ApprovalsComponent implements OnInit {
 
   private loadPendingProducts(): void {
     this.isLoading = true;
-    this.productService.getProducts(this.currentPage + 1, this.pageSize).subscribe({
+    this.rentalProductService.getPendingProducts(this.currentPage + 1, this.pageSize).subscribe({
       next: (response) => {
         this.dataSource.data = response.data;
         this.totalItems = response.total;
@@ -155,7 +162,7 @@ export class ApprovalsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.productService.approveProduct(product.inventoryMasterId).subscribe({
+        this.rentalProductService.approveRentalProduct(product.inventoryMasterId).subscribe({
           next: () => {
             this.loadPendingProducts();
             this.snackBar.open('Product approved successfully', 'Close', { duration: 3000 });
@@ -175,7 +182,7 @@ export class ApprovalsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.productService.rejectProduct(product.id, result.comments).subscribe({
+        this.rentalProductService.rejectRentalProduct(product.id, result.comments).subscribe({
           next: () => {
             this.loadPendingProducts();
             this.snackBar.open('Product rejected successfully', 'Close', { duration: 3000 });
@@ -220,7 +227,7 @@ export class ApprovalsComponent implements OnInit {
       if (result) {
         // In a real app, you would make a bulk approval API call
         selectedProducts.forEach(product => {
-          this.productService.approveProduct(product.id).subscribe();
+          this.rentalProductService.approveRentalProduct(product.id).subscribe();
         });
         
         setTimeout(() => {
@@ -242,7 +249,7 @@ export class ApprovalsComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         selectedProducts.forEach(product => {
-          this.productService.rejectProduct(product.id, result.comments).subscribe();
+          this.rentalProductService.rejectRentalProduct(product.id, result.comments).subscribe();
         });
         
         setTimeout(() => {

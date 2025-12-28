@@ -71,17 +71,11 @@
       @if(dropdownStates.products && !collapsed){
       <div class="ml-8">
         @if (user?.role === "super_admin"){
-          <a mat-list-item routerLink="/approve-products" routerLinkActive="active-nav-item" class="text-sm">
+          <a mat-list-item routerLink="/products/approve-products" routerLinkActive="active-nav-item" class="text-sm">
             <mat-icon matListItemIcon>check</mat-icon>
-            <span matListItemTitle>Admin Approve</span>
+            <span matListItemTitle>Admin Approvals</span>
           </a>
         }@else{
-          <a mat-list-item routerLink="/products" routerLinkActive="active-nav-item">
-            <mat-icon matListItemIcon>verified_user</mat-icon>
-            @if(!collapsed){
-            <span matListItemTitle>Verifying Products</span>
-            }
-          </a>
           <a mat-list-item routerLink="/reject-products" routerLinkActive="active-nav-item">
             <mat-icon matListItemIcon>cancel</mat-icon>
             @if(!collapsed){
@@ -89,14 +83,47 @@
             }
           </a>
         }
+          <a mat-list-item routerLink="/products" routerLinkActive="active-nav-item">
+            <mat-icon matListItemIcon>verified_user</mat-icon>
+            @if(!collapsed){
+            <span matListItemTitle>Verified Products</span>
+            }
+          </a>
       </div>
       }
-      <a mat-list-item routerLink="/rental-products" routerLinkActive="active-nav-item">
+
+      <a mat-list-item class="cursor-pointer" (click)="toggleDropdown('rental')" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>loop</mat-icon>
         @if(!collapsed){
-        <span matListItemTitle>Rental Products</span>
+          <span matListItemTitle class="flex">
+            <span>Rental Products</span>
+            <mat-icon class="ml-auto">{{ dropdownStates.rental ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </span>
         }
       </a>
+      @if(dropdownStates.rental && !collapsed){
+      <div class="ml-8">
+        @if (user?.role === "super_admin"){
+          <a mat-list-item routerLink="rental-products/rental-approve-products" routerLinkActive="active-nav-item" class="text-sm">
+            <mat-icon matListItemIcon>check</mat-icon>
+            <span matListItemTitle>Admin Approvals</span>
+          </a>
+        }@else{
+          <a mat-list-item routerLink="/reject-rental-products" routerLinkActive="active-nav-item">
+            <mat-icon matListItemIcon>cancel</mat-icon>
+            @if(!collapsed){
+            <span matListItemTitle>Rejected Products</span>
+            }
+          </a>
+        }
+        <a mat-list-item routerLink="/rental-products" routerLinkActive="active-nav-item">
+            <mat-icon matListItemIcon>verified_user</mat-icon>
+            @if(!collapsed){
+            <span matListItemTitle>Verified Products</span>
+            }
+          </a>
+      </div>
+      }
       <!-- @if (user?.role === "super_admin") {
       <a mat-list-item routerLink="/categories" routerLinkActive="active-nav-item">
         <mat-icon matListItemIcon>category</mat-icon>

@@ -16,46 +16,40 @@ export const routes: Routes = [
     loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
     canActivate: [authGuard],
     children: [
-      {
-        path: 'dashboard',
+      { path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
-      {
-        path: 'inventory',
+      { path: 'inventory',
         loadComponent: () => import('./features/inventory/inventory').then(i => i.Inventory)
       },
-      {
-        path: 'users',
+      { path: 'users',
         loadComponent: () => import('./features/users/users.component').then(m => m.UsersComponent)
       },
-      {
-        path: 'products',
-        loadComponent: () => import('./features/products/products.component').then(m => m.ProductsComponent)
-      },
-      {
-        path: 'categories',
-        loadComponent: () => import('./features/categorys/categorys').then(c => c.Categorys)
-      },
-      {
-        path: 'stores',
+      // { path: 'categories',
+      //   loadComponent: () => import('./features/categorys/categorys').then(c => c.Categorys)
+      // },
+      { path: 'stores',
         loadComponent: () => import('./features/stores/stores.component').then(m => m.StoresComponent)
       },
-      {
-        path: 'orders',
+      { path: 'orders',
         loadComponent: () => import('./features/orders/orders.component').then(m => m.OrdersComponent)
       },
-      {
-        path: 'approve-products',
-        loadComponent: () => import('./features/approvals/approvals.component').then(m => m.ApprovalsComponent)
+      { path: 'products',
+        loadComponent: () => import('./features/products/products.component').then(m => m.ProductsComponent),
+        children: [
+          { path: 'approve-products',
+            loadComponent: () => import('./features/products/approvals/approvals.component').then(m => m.ApprovalsComponent)
+          },
+        ]
       },
-      {
-        path: 'rental-products',
-        loadComponent: () => import('./features/rental-products/rental-products').then(r => r.RentalProducts)
+      { path: 'rental-products',
+        loadComponent: () => import('./features/rental-products/rental-products').then(r => r.RentalProducts),
+        children: [
+          { path: 'rental-approve-products',
+            loadComponent: () => import('./features/rental-products/rental-approvals/approvals.component').then(m => m.RentalApprovalsComponent)
+          }
+        ]
       },
-      {
-        path: 'rental-approve-products',
-        loadComponent: () => import('./features/approvals/approvals.component').then(m => m.ApprovalsComponent)
-      }
     ]
   },
   { path: '**', redirectTo: '/login' }

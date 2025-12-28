@@ -39,6 +39,10 @@ export class ProductService {
     return this.httpClient.get<any[]>(`${environment.API_URL}${environment.inventoryMiddleWare}/online-products/filter?page=${page}&pageSize=${pageSize}`);
   }
 
+  getOnlineVerifiedProducts(page: number, pageSize: number): Observable<any> {
+    return this.httpClient.get(`${environment.API_URL}${environment.inventoryMiddleWare}/get/online/verified`);
+  }
+
   deleteProduct(id: number): Observable<boolean> {
     const currentProducts = this.productsSubject.value;
     const filteredProducts = currentProducts.filter((p) => p.id !== id);
@@ -51,7 +55,7 @@ export class ProductService {
     return this.httpClient.post(`${environment.API_URL}${environment.inventoryMiddleWare}/verify-online/${id}`, {})
   }
 
-  rejectProduct(id: number, comments: string): Observable<boolean> {
-    return this.deleteProduct(id);
+  rejectProduct(id: number, remark: string): Observable<any> {
+    return this.httpClient.put(`${environment.API_URL}${environment.inventoryMiddleWare}/reject/inventoryMasterId/${id}`, { remark });
   }
 }
