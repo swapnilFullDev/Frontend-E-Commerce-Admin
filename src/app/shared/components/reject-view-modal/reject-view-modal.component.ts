@@ -27,7 +27,7 @@ import { MatIconModule } from '@angular/material/icon';
           <mat-icon class="text-red-500 mr-2 mt-1">error_outline</mat-icon>
           <div>
             <p class="text-red-800 font-medium mb-2">Product Rejection Reason:</p>
-            <p class="text-red-700">{{ data.remark }}</p>
+            <p class="text-red-700">{{ data.rejectRentalProductRemark }}</p>
           </div>
         </div>
       </div>
@@ -42,7 +42,7 @@ import { MatIconModule } from '@angular/material/icon';
 export class RejectViewModalComponent {
   constructor(
     public dialogRef: MatDialogRef<RejectViewModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { remark: string }
+    @Inject(MAT_DIALOG_DATA) public data: { rejectRentalProductRemark: string }
   ) {}
 
   close(): void {

@@ -9,6 +9,9 @@ export const routes: Routes = [
   { path: 'signup',
     loadComponent: () => import('./features/signup/signup').then(s => s.Signup)
   },
+  { path: 'reset-password/:token',
+    loadComponent: () => import('./features/auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+  },
   { path: '',
     loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
     canActivate: [authGuard],

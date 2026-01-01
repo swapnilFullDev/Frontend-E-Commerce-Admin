@@ -66,8 +66,8 @@ export class OnlineReject {
     this.isLoading = true;
     this.rentalProductService.getRentalRejectProducts(this.currentPage + 1, this.pageSize).subscribe({
       next: (response) => {
-        this.dataSource.data = response.data;
-        this.totalItems = response.total;
+        this.dataSource.data = response.data.onlineRejected.items;
+        this.totalItems = response.pagination.totalItems - 2;
         this.dataSource.sort = this.sort;
         this.selection.clear();
         this.isLoading = false;

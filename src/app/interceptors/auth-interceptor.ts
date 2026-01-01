@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
+import { AuthService } from '../core/services/auth.service';
 
 const AUTH_EXCLUDE_URLS = [
   '/login',
@@ -11,6 +12,7 @@ const AUTH_EXCLUDE_URLS = [
 
 export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
   const router = inject(Router);
+  const authService = inject(AuthService);
   let cloned = req;
   
   const shouldSkip = AUTH_EXCLUDE_URLS.some((url) => req.url.includes(url));
@@ -41,9 +43,12 @@ export const authInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
       switch (error.status) {
         case 401:
           message = "Unauthorized! Please log in again.";
+          authService.logout();
           router.navigateByUrl("/login");
           break;
         case 403:
+          authService.logout();
+          router.navigateByUrl("/login");
           message = "Access denied!";
           break;
         case 404:

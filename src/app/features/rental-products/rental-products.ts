@@ -63,13 +63,16 @@ export class RentalProducts implements AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadProducts();
+    // this.loadProducts();
     this.checkActiveRoute();
     
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
       this.checkActiveRoute();
+      if(this.router.url === '/rental-products') {
+        this.loadProducts();
+      }
     });
   }
 

@@ -15,6 +15,7 @@ import { Observable } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { AuthUser } from '../../core/models/user.interface';
 import { ProfileModalComponent } from '../../features/signup/profile-modal/profile-modal.component';
+import { ChangePasswordModalComponent } from '../../shared/components/change-password-modal/change-password-modal.component';
 
 @Component({
   selector: 'app-main-layout',
@@ -96,6 +97,12 @@ export class MainLayoutComponent implements OnInit {
           userData: user
         }
       });
+    });
+  }
+
+  openChangePassword(): void {
+    this.dialog.open(ChangePasswordModalComponent, {
+      width: '400px'
     });
   }
 }

@@ -68,4 +68,25 @@ export class AuthService {
   updateProfile(businessId: number, updateData: any) {
     return this.httpClient.put(`${this.baseUrl}${environment.businessMiddleWare}/businessId/${businessId}`, updateData);
   }
+
+  forgetPassword(email: string): Observable<any> {
+    return this.httpClient.post(
+      `${this.baseUrl}${environment.adminMiddleWare}/forgot-password-admin`,
+      { email }
+    );
+  }
+
+  resetPassword(resetData: { token: string; newPassword: string; confirmPassword: string }): Observable<any> {
+    return this.httpClient.post(
+      `${this.baseUrl}${environment.adminMiddleWare}/reset-password-admin`,
+      resetData
+    );
+  }
+
+  changePassword(changePasswordData: { oldPassword: string; newPassword: string; confirmPassword:string }): Observable<any> {
+    return this.httpClient.put(
+      `${this.baseUrl}${environment.adminMiddleWare}/change-admin-user-password`,
+      changePasswordData
+    );
+  }
 }

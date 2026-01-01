@@ -28,8 +28,10 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
+  forgotPasswordForm: FormGroup;
   hidePassword = true;
   isLoading = false;
+  showForgotPassword = false;
 
   constructor(
     private fb: FormBuilder,
@@ -40,6 +42,10 @@ export class LoginComponent implements OnInit {
     this.loginForm = this.fb.group({
       email: ['superAdmin@attirebandhan.com', [Validators.required, Validators.email]],
       password: ['Admin@123', [Validators.required, Validators.minLength(6)]]
+    });
+    
+    this.forgotPasswordForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
     });
   }
 
@@ -53,17 +59,6 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.valid && !this.isLoading) {
       this.isLoading = true;
       
-      // this.authService.login(this.loginForm.value).subscribe({
-      //   next: (user) => {
-      //     this.snackBar.open('Login successful!', 'Close', { duration: 3000 });
-      //     this.router.navigate(['/dashboard']);
-      //     this.isLoading = false;
-      //   },
-      //   error: (error) => {
-      //     this.snackBar.open('Invalid credentials. Please try again.', 'Close', { duration: 3000 });
-      //     this.isLoading = false;
-      //   }
-      // });
       console.log(this.loginForm.value);
       this.authService.loginUser(this.loginForm.value).subscribe({
         next: (user) => {
@@ -76,6 +71,30 @@ export class LoginComponent implements OnInit {
           this.isLoading = false;
         }
       })
+    }
+  }
+
+  toggleForgotPassword(): void {
+    this.showForgotPassword = !this.showForgotPassword;
+  }
+
+  onForgotPasswordSubmit(): void {
+    if (this.forgotPasswordForm.valid && !this.isLoading) {
+      this.isLoading = true;
+      // Add forgot password API call here
+      this.authService.forgetPassword(this.forgotPasswordForm.value.email).subscribe({
+        next: (response) => {
+          console.log('Forgot password response:', response);
+          this.snackBar.open('Password reset link sent to your email!', 'Close', { duration: 3000 });
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.snackBar.open('Error sending password reset link. Please try again.', 'Close', { duration: 3000 });
+          this.isLoading = false;
+        }
+      });
+      // this.snackBar.open('Password reset link sent to your email!', 'Close', { duration: 3000 });
+      // this.isLoading = false;
     }
   }
 }

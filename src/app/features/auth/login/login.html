@@ -22,6 +22,8 @@
         </mat-card>
 
         <mat-card-content>
+            <!-- Login Form -->
+            @if(!showForgotPassword) {
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
                 <mat-form-field class="w-full">
                     <mat-label>Email</mat-label>
@@ -58,15 +60,43 @@
                     }
                 </mat-form-field>
 
-                <!-- <div class="bg-blue-50 p-3 rounded-lg text-sm text-blue-800">
-              <strong>Demo Credentials:</strong><br>
-              Email: admin_admin.com<br>
-              Password: admin123
-            </div> -->
+                <div class="text-right">
+                    <button type="button" mat-button class="text-blue-600" (click)="toggleForgotPassword()">
+                        Forgot Password?
+                    </button>
+                </div>
             </form>
+            }
+            <!-- Forgot Password Form -->
+            @else if(showForgotPassword) {
+            <form [formGroup]="forgotPasswordForm" (ngSubmit)="onForgotPasswordSubmit()" class="space-y-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Email Address</mat-label>
+                    <input matInput type="email" formControlName="email" placeholder="Enter your email">
+                    <mat-icon matSuffix>email</mat-icon>
+                    @if(forgotPasswordForm.get('email')?.hasError('required')){
+                    <mat-error>
+                        Email is required
+                    </mat-error>
+                    }
+                    @if(forgotPasswordForm.get('email')?.hasError('email')){
+                    <mat-error>
+                        Please enter a valid email
+                    </mat-error>
+                    }
+                </mat-form-field>
+
+                <div class="text-right">
+                    <button type="button" mat-button class="text-blue-600" (click)="toggleForgotPassword()">
+                        Back to Login
+                    </button>
+                </div>
+            </form>
+            }
         </mat-card-content>
 
         <mat-card-actions class="px-6 pb-6 gap-2">
+            @if(!showForgotPassword) {
             <button mat-raised-button color="primary" class="w-full py-3" [disabled]="loginForm.invalid || isLoading"
                 (click)="onSubmit()">
                 @if(!isLoading){
@@ -79,6 +109,16 @@
                 [routerLink]="['/signup']">
                 Create Account
             </button>
+            } @else {
+            <button mat-raised-button color="primary" class="w-full py-3" [disabled]="forgotPasswordForm.invalid || isLoading"
+                (click)="onForgotPasswordSubmit()">
+                @if(!isLoading){
+                <span>Send Reset Link</span>
+                }@else{
+                <span>Sending...</span>
+                }
+            </button>
+            }
         </mat-card-actions>
         <p>
             mehtaji@yopmail.com
