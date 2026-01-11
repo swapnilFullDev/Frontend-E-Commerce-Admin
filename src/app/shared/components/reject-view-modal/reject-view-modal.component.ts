@@ -17,7 +17,7 @@ import { MatIconModule } from '@angular/material/icon';
     <div class="p-6">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-semibold text-gray-800">Rejection Remark</h2>
-        <button mat-icon-button (click)="close()">
+        <button mat-icon-button (click)="close()" class="square-icon-btn">
           <mat-icon>close</mat-icon>
         </button>
       </div>

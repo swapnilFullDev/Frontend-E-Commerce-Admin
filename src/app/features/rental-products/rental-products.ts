@@ -63,31 +63,34 @@ export class RentalProducts implements AfterViewInit {
   ) {}
 
   ngOnInit(): void {
-    // this.loadProducts();
-    this.checkActiveRoute();
-    
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
-      this.checkActiveRoute();
-      if(this.router.url === '/rental-products') {
-        this.loadProducts();
-      }
-    });
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.checkActiveRouteAndLoad();
+      });
+
+    // Run once on initial load
+    this.checkActiveRouteAndLoad();
+  }
+
+  private checkActiveRouteAndLoad(): void {
+    const isProductsRoot = this.router.url === '/rental-products';
+
+    this.hasActiveChildRoute = !isProductsRoot;
+
+    if (isProductsRoot) {
+      this.loadProducts();
+    }
   }
 
   ngAfterViewInit(): void {
     if (this.paginator) {
       this.paginator.page.subscribe((event: PageEvent) => {
-        this.currentPage = event.pageIndex + 1;
+        this.currentPage = event.pageIndex || 1;
         this.pageSize = event.pageSize;
         this.loadProducts();
       });
     }
-  }
-
-  private checkActiveRoute(): void {
-    this.hasActiveChildRoute = this.router.url !== '/rental-products';
   }
 
   private loadProducts(): void {
@@ -120,23 +123,10 @@ export class RentalProducts implements AfterViewInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  // openProductModal(product?: Product): void {
-  //   const dialogRef = this.dialog.open(AddRentalProducts, {
-  //     width: '600px',
-  //     data: product || null
-  //   });
-
-  //   dialogRef.afterClosed().subscribe(result => {
-  //     if (result) {
-  //       this.loadProducts();
-  //       this.snackBar.open(product ? 'Rental product updated successfully' : 'Rental product created successfully', 'Close', { duration: 3000 });
-  //     }
-  //   });
-  // }
-
   deleteProduct(product: Product): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
+      disableClose: true,
       data: {
         title: 'Delete Product',
         message: `Are you sure you want to delete "${product.name}"? This action cannot be undone.`,

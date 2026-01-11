@@ -29,7 +29,8 @@
                     <mat-label>Email</mat-label>
                     <input matInput type="email" formControlName="email" placeholder="admin@admin.com">
                     <mat-icon matSuffix>email</mat-icon>
-                    @if(loginForm.get('email')?.hasError('required')){
+                    <app-form-validation [control]="forgotPasswordForm.get('email')" fieldName="Email"></app-form-validation>
+                    <!-- @if(loginForm.get('email')?.hasError('required')){
                     <mat-error>
                         Email or Username is required
                     </mat-error>
@@ -38,7 +39,7 @@
                     <mat-error>
                         Please enter a valid email/username
                     </mat-error>
-                    }
+                    } -->
                 </mat-form-field>
 
                 <mat-form-field class="w-full">
@@ -48,7 +49,8 @@
                     <button matSuffix mat-icon-button (click)="hidePassword = !hidePassword" type="button">
                         <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
                     </button>
-                    @if(loginForm.get('password')?.hasError('required')){
+                    <app-form-validation [control]="loginForm.get('password')" fieldName="Password"></app-form-validation>
+                    <!-- @if(loginForm.get('password')?.hasError('required')){
                     <mat-error>
                         Password is required
                     </mat-error>
@@ -57,7 +59,7 @@
                     <mat-error>
                         Password must be at least 6 characters
                     </mat-error>
-                    }
+                    } -->
                 </mat-form-field>
 
                 <div class="text-right">
@@ -74,7 +76,8 @@
                     <mat-label>Email Address</mat-label>
                     <input matInput type="email" formControlName="email" placeholder="Enter your email">
                     <mat-icon matSuffix>email</mat-icon>
-                    @if(forgotPasswordForm.get('email')?.hasError('required')){
+                    <app-form-validation [control]="forgotPasswordForm.get('email')" fieldName="Email"></app-form-validation>
+                    <!-- @if(forgotPasswordForm.get('email')?.hasError('required')){
                     <mat-error>
                         Email is required
                     </mat-error>
@@ -83,7 +86,7 @@
                     <mat-error>
                         Please enter a valid email
                     </mat-error>
-                    }
+                    } -->
                 </mat-form-field>
 
                 <div class="text-right">
@@ -123,6 +126,10 @@
         <p>
             mehtaji@yopmail.com
             qeovb1hk
+        </p>
+        <p>
+            scs@yopmail.com
+            p9erg7te
         </p>
     </mat-card>
 </div>

@@ -15,9 +15,9 @@ export class StoreService {
   private httpClient = inject(HttpClient);
   constructor() {  }
 
-  getStores(pageNo=1,limit=5,searchName=""): Observable<Store[]> {
+  getStores(pageNo=1,limit=5,searchName="",isVerified=""): Observable<Store[]> {
     return this.httpClient
-      .get<any>(`${environment.API_URL}${environment.businessMiddleWare}/all?page=${pageNo}&limit=${limit}&businessName=${searchName}`);
+      .get<any>(`${environment.API_URL}${environment.businessMiddleWare}/all?page=${pageNo}&limit=${limit}&search=${searchName}&isVerified=${isVerified}`);
   }
 
   createStore(store: Omit<Store, "id" | "createdAt">) {}

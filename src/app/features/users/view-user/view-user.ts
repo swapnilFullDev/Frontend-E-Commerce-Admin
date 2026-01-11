@@ -8,9 +8,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { User } from '../../../core/models/user.interface';
 import { UsersComponent } from '../users.component';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-add-user',
+  selector: 'app-view-user',
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -18,11 +19,12 @@ import { UsersComponent } from '../users.component';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule],
-  templateUrl: './add-user.html',
-  styleUrl: './add-user.css'
+    MatButtonModule,
+    MatIcon
+  ],
+  templateUrl: './view-user.html',
 })
-export class AddUser {
+export class ViewUser {
   userForm: FormGroup;
   isLoading = false;
 
@@ -32,20 +34,18 @@ export class AddUser {
     @Inject(MAT_DIALOG_DATA) public data: User | null = null
   ) {
     this.userForm = this.fb.group({
-      name: [data?.name || '', Validators.required],
-      email: [data?.email || '', [Validators.required, Validators.email]],
-      role: [data?.role || '', Validators.required],
-      isActive: [data?.isActive ?? true]
+      name: [{ value: data?.name || '', disabled: true }],
+      email: [{ value: data?.email || '', disabled: true }],
+      role: [{ value: data?.role || '', disabled: true }],
+      isActive: [{ value: data?.isActive ?? true, disabled: true }]
     });
   }
 
-  onSave(): void {
-    if (this.userForm.valid) {
-      this.isLoading = true;
-      setTimeout(() => {
-        this.dialogRef.close();
-        this.isLoading = false;
-      }, 1000);
-    }
+  onDelete(): void {
+    this.dialogRef.close({ action: 'delete', user: this.data });
+  }
+
+  onCancel(): void {
+    this.dialogRef.close();
   }
 }

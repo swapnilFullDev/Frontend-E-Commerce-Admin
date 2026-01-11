@@ -43,8 +43,8 @@ export class RentalReject {
   displayedColumns: string[] = ['name', 'remark', 'actions'];
   dataSource = new MatTableDataSource<Product>();
   isLoading = true;
-  pageSize = 10;
-  currentPage = 0;
+  pageSize = 5;
+  currentPage = 1;
   totalItems = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -62,10 +62,10 @@ export class RentalReject {
 
   private loadPendingProducts(): void {
     this.isLoading = true;
-    this.rentalProductService.getRentalRejectProducts(this.currentPage + 1, this.pageSize).subscribe({
+    this.rentalProductService.getRentalRejectProducts(this.currentPage, this.pageSize).subscribe({
       next: (response) => {
-        this.dataSource.data = response.data.rentalRejected.items;
-        this.totalItems = response.pagination.totalItems - 2;
+        this.dataSource.data = response.data.items;
+        this.totalItems = response.data.pagination.totalItems - 2;
         this.dataSource.sort = this.sort;
         this.isLoading = false;
       },
@@ -77,7 +77,7 @@ export class RentalReject {
   }
 
   onPageChange(event: any): void {
-    this.currentPage = event.pageIndex;
+    this.currentPage = event.pageIndex || 1;
     this.pageSize = event.pageSize;
     this.loadPendingProducts();
   }
@@ -94,6 +94,7 @@ export class RentalReject {
   viewRemark(product: any): void {
     this.dialog.open(RejectViewModalComponent, {
       width: '400px',
+      disableClose: true,
       data: { remark: product.remark }
     });
   }

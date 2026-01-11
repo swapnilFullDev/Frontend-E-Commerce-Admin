@@ -9,6 +9,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../../../core/services/auth.service';
+import { FormValidationComponent } from "../../../shared/components/form-validation/form-validation.component";
 
 @Component({
   selector: 'app-login',
@@ -22,8 +23,9 @@ import { AuthService } from '../../../core/services/auth.service';
     MatCardModule,
     MatIconModule,
     MatSnackBarModule,
-    RouterLink
-  ],
+    RouterLink,
+    FormValidationComponent
+],
   templateUrl: "./login.html"
 })
 export class LoginComponent implements OnInit {

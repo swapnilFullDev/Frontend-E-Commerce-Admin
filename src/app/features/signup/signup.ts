@@ -153,6 +153,7 @@ export class Signup {
       
       this.authService.signUpStore(formData).subscribe((response: any) => {
         console.log(response);
+        this.router.navigate(['/login']);
         this.isLoading = false;
       }, error => {
         console.error(error);

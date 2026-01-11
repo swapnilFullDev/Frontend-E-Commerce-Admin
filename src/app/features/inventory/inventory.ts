@@ -114,6 +114,7 @@ export class Inventory implements OnInit, OnDestroy {
 
   openDialog(item?: InventoryItem) {
     const dialogRef = this.dialog.open(AddInventory, {
+      disableClose: true,
       width: "700px",
       height: "625px",
       maxHeight: "100%",
@@ -129,6 +130,7 @@ export class Inventory implements OnInit, OnDestroy {
 
   deleteItem(item: any) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      disableClose: true,
       width: "350px",
       data: { message: `Delete product "${item.product_name}"?` },
     });

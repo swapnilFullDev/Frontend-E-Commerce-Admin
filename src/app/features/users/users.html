@@ -4,7 +4,7 @@
           <h1 class="text-3xl font-bold text-gray-800 mb-2">User Management</h1>
           <p class="text-gray-600">Manage user accounts and permissions</p>
         </div>
-        <button 
+        <!-- <button 
           mat-raised-button 
           color="primary" 
           class="flex items-center gap-2"
@@ -12,7 +12,7 @@
           (click)="openUserModal()">
           <mat-icon>add</mat-icon>
           Add User
-        </button>
+        </button> -->
       </div>
 
       <mat-card>
@@ -27,143 +27,124 @@
           </div>
 
           <!-- Loading -->
-          <app-loading *ngIf="isLoading"></app-loading>
-
-          <!-- Table -->
-          <div class="overflow-x-auto hidden md:block" *ngIf="!isLoading">
-            <table mat-table [dataSource]="dataSource" matSort class="w-full">
+           @if(isLoading){
+             <app-loading></app-loading>
+           }@else {
+             <!-- Table -->
+             <div class="overflow-x-auto hidden md:block" *ngIf="!isLoading">
+               <table mat-table [dataSource]="dataSource" matSort class="w-full">
+   
+                <ng-container matColumnDef="userImage">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Image</th>
+                <td mat-cell *matCellDef="let user">
+                  <div class="relative w-20 h-20 bg-gray-100 rounded overflow-hidden"  >
+                    <img [ngSrc]="user.profileImage || 'assets/AttireBandhan.png'" fill class="object-cover" priority>
+                  </div>
+                </td>
+              </ng-container>
               
-              <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> ID </th>
-                <td mat-cell *matCellDef="let user"> {{ user.id }} </td>
-              </ng-container>
+                 <ng-container matColumnDef="name">
+                   <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> Name </th>
+                   <td mat-cell *matCellDef="let user"> {{ user.fullName }} </td>
+                 </ng-container>
+   
+                 <ng-container matColumnDef="email">
+                   <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> Email </th>
+                   <td mat-cell *matCellDef="let user"> {{ user.email }} </td>
+                 </ng-container>
+   
+                 <ng-container matColumnDef="gender">
+                   <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> Gender </th>
+                   <td mat-cell *matCellDef="let user">
+                     <mat-chip-set>
+                      <!-- [color]="getRoleColor(user.role)" selected -->
+                       <mat-chip >{{ user.gender }}</mat-chip>
+                     </mat-chip-set>
+                   </td>
+                 </ng-container>
+   
+                 <ng-container matColumnDef="status">
+                   <th mat-header-cell *matHeaderCellDef class="font-semibold"> Status </th>
+                   <td mat-cell *matCellDef="let user">
+                     <mat-chip-set>
+                       <mat-chip [color]="user.isDeleted ? 'accent' : 'warn'" selected>
+                         {{ user.isDeleted ? 'Active' : 'Inactive' }}
+                       </mat-chip>
+                     </mat-chip-set>
+                   </td>
+                 </ng-container>
+   
+                 <ng-container matColumnDef="createdAt">
+                   <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> Created </th>
+                   <td mat-cell *matCellDef="let user"> {{ user.createdAt | date:'shortDate' }} </td>
+                 </ng-container>
+   
+                 <ng-container matColumnDef="actions">
+                   <th mat-header-cell *matHeaderCellDef class="font-semibold"> Actions </th>
+                   <td mat-cell *matCellDef="let user">
+                     <button 
+                       mat-icon-button 
+                       color="primary" 
+                       (click)="openUserModal(user)"
+                       matTooltip="Edit user">
+                       <mat-icon>remove_red_eye</mat-icon>
+                     </button>
+                     <button 
+                       mat-icon-button 
+                       color="warn" 
+                       (click)="deleteUser(user)"
+                       matTooltip="Delete user">
+                       <mat-icon>delete</mat-icon>
+                     </button>
+                   </td>
+                 </ng-container>
+   
+                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                 <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
+               </table>
+             </div>
+              <!-- Mobile Card View -->
+              <div class="md:hidden space-y-4">
+                  <!-- *ngFor="let user  dataSource" -->
+                  @for (user of dataSource.filteredData; track $index) {
+                  <mat-card class="p-4 border rounded shadow-sm">
+                      <mat-card-content>
+                          <div class="grid grid-cols-2 gap-y-2 text-sm">
+                              <span class="font-semibold">Name:</span> <span>{{ user.fullName }}</span>
+                              <span class="font-semibold">Email:</span>
+                              <span class="break-words">{{ user.email }}</span>
+                              <span class="font-semibold">Gender:</span>
+                              <mat-chip-set>
+                                  <mat-chip class="break-words">{{ user.gender }}</mat-chip>
+                              </mat-chip-set>
+                              <span class="font-semibold">Status:</span>
+                              <mat-chip-set>
+                                  <mat-chip [color]="user.isDeleted ? 'accent' : 'warn'" selected>
+                                      {{ user.isDeleted ? 'Active' : 'Inactive' }}
+                                  </mat-chip>
+                              </mat-chip-set>
+                              <!-- <span class="font-semibold">Created:</span> <span>{{ user.createdAt | date:'shortDate' }}</span> -->
+                          </div>
+                      </mat-card-content>
+              
+                      <mat-card-actions class="flex gap-2 mt-3">
+                          <button mat-icon-button color="primary" (click)="openUserModal(user)">
+                              <mat-icon>remove_red_eye</mat-icon>
+                          </button>
+                          <button mat-icon-button color="warn" (click)="deleteUser(user)">
+                              <mat-icon>delete</mat-icon>
+                          </button>
+                      </mat-card-actions>
+                  </mat-card>
+                  }
+              </div>
+              <mat-paginator 
+                    [pageSizeOptions]="[5, 10, 20]" 
+                    showFirstLastButtons
+                    class="mt-4">
+              </mat-paginator>
+           }
 
-              <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> Name </th>
-                <td mat-cell *matCellDef="let user"> {{ user.name }} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="email">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> Email </th>
-                <td mat-cell *matCellDef="let user"> {{ user.email }} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="role">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> Role </th>
-                <td mat-cell *matCellDef="let user">
-                  <mat-chip-set>
-                    <mat-chip [color]="getRoleColor(user.role)" selected>{{ user.role }}</mat-chip>
-                  </mat-chip-set>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef class="font-semibold"> Status </th>
-                <td mat-cell *matCellDef="let user">
-                  <mat-chip-set>
-                    <mat-chip [color]="user.isActive ? 'accent' : 'warn'" selected>
-                      {{ user.isActive ? 'Active' : 'Inactive' }}
-                    </mat-chip>
-                  </mat-chip-set>
-                </td>
-              </ng-container>
-
-              <ng-container matColumnDef="createdAt">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header class="font-semibold"> Created </th>
-                <td mat-cell *matCellDef="let user"> {{ user.createdAt | date:'shortDate' }} </td>
-              </ng-container>
-
-              <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef class="font-semibold"> Actions </th>
-                <td mat-cell *matCellDef="let user">
-                  <button 
-                    mat-icon-button 
-                    color="primary" 
-                    (click)="openUserModal(user)"
-                    matTooltip="Edit user">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button 
-                    mat-icon-button 
-                    color="warn" 
-                    (click)="deleteUser(user)"
-                    matTooltip="Delete user">
-                    <mat-icon>delete</mat-icon>
-                  </button>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
-            </table>
-
-            <mat-paginator 
-              [pageSizeOptions]="[5, 10, 20]" 
-              showFirstLastButtons
-              class="mt-4">
-            </mat-paginator>
-          </div>
-        <!-- Mobile Card View -->
-        <div class="md:hidden space-y-4" *ngIf="!isLoading">
-            <!-- *ngFor="let user  dataSource" -->
-            @for (user of dataSource.filteredData; track $index) {
-            <mat-card class="p-4 border rounded shadow-sm">
-                <!-- <div class="grid grid-cols-2 gap-2">
-                                 <span class="font-semibold">ID:</span> <span>{{ user.id }}</span>
-                                 <span class="font-semibold">Name:</span> <span>{{ user.name }}</span>
-                                 <span class="font-semibold">Email:</span> <span>{{ user.email }}</span>
-                                 <span class="font-semibold">Role:</span>
-                                 <mat-chip-set>
-                                     <mat-chip [color]="getRoleColor(user.role)" selected>{{ user.role }}</mat-chip>
-                                 </mat-chip-set>
-                                 <span class="font-semibold">Status:</span>
-                                 <mat-chip-set>
-                                     <mat-chip [color]="user.isActive ? 'accent' : 'warn'" selected>
-                                         {{ user.isActive ? 'Active' : 'Inactive' }}
-                                     </mat-chip>
-                                 </mat-chip-set>
-                                 <span class="font-semibold">Created:</span> <span>{{ user.createdAt | date:'shortDate' }}</span>
-                             </div>
-                     
-                             <div class="flex gap-2 mt-3">
-                                 <button mat-icon-button color="primary" (click)="openUserModal(user)">
-                                     <mat-icon>edit</mat-icon>
-                                 </button>
-                                 <button mat-icon-button color="warn" (click)="deleteUser(user)">
-                                     <mat-icon>delete</mat-icon>
-                                 </button>
-                             </div> -->
-                <mat-card-content>
-                    <div class="grid grid-cols-2 gap-y-2 text-sm">
-                        <span class="font-semibold">ID:</span> <span>{{ user.id }}</span>
-                        <span class="font-semibold">Name:</span> <span>{{ user.name }}</span>
-                        <span class="font-semibold">Email:</span>
-                        <span class="break-words">{{ user.email }}</span>
-                        <span class="font-semibold">Role:</span>
-                        <mat-chip-set>
-                            <mat-chip [color]="getRoleColor(user.role)" class="break-words" selected>{{ user.role }}</mat-chip>
-                        </mat-chip-set>
-                        <span class="font-semibold">Status:</span>
-                        <mat-chip-set>
-                            <mat-chip [color]="user.isActive ? 'accent' : 'warn'" selected>
-                                {{ user.isActive ? 'Active' : 'Inactive' }}
-                            </mat-chip>
-                        </mat-chip-set>
-                        <span class="font-semibold">Created:</span> <span>{{ user.createdAt | date:'shortDate' }}</span>
-                    </div>
-                </mat-card-content>
-        
-                <mat-card-actions class="flex gap-2 mt-3">
-                    <button mat-icon-button color="primary" (click)="openUserModal(user)">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button color="warn" (click)="deleteUser(user)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </mat-card-actions>
-            </mat-card>
-            }
-        </div>
         </mat-card-content>
       </mat-card>
     </div>

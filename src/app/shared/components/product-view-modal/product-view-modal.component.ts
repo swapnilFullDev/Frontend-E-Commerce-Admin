@@ -42,33 +42,34 @@ export class ProductViewModalComponent {
 
   formatCurrency = CommonUtils.formatCurrency;
 
-  approveProduct(product: Product = this.data): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
-      data: {
-        title: 'Approve Product',
-        message: `Are you sure you want to approve "${product.productName}" ?`,
-        confirmText: 'Approve',
-        cancelText: 'Cancel'
-      }
-    });
+  // approveProduct(product: Product = this.data): void {
+  //   const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+  //     width: '400px',
+  //     disableClose: true,
+  //     data: {
+  //       title: 'Approve Product',
+  //       message: `Are you sure you want to approve "${product.productName}" ?`,
+  //       confirmText: 'Approve',
+  //       cancelText: 'Cancel'
+  //     }
+  //   });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.productService.approveProduct(product.inventoryMasterId).subscribe({
-          next: () => {
-            this.snackBar.open('Product approved successfully', 'Close', { duration: 3000 });
-            this.close();
-          },
-          error: (error) => {
-            this.snackBar.open('Error approving product', 'Close', { duration: 3000 });
-          }
-        });
-      }
-    });
-  }
+  //   dialogRef.afterClosed().subscribe(result => {
+  //     if (result) {
+  //       this.productService.approveProduct(product.inventoryMasterId).subscribe({
+  //         next: () => {
+  //           this.snackBar.open('Product approved successfully', 'Close', { duration: 3000 });
+  //           this.close();
+  //         },
+  //         error: (error) => {
+  //           this.snackBar.open('Error approving product', 'Close', { duration: 3000 });
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
 
-  close(): void {
-    this.dialogRef.close();
-  }
+  // close(): void {
+  //   this.dialogRef.close();
+  // }
 }

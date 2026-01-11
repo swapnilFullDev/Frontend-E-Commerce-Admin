@@ -91,8 +91,8 @@ export class ApprovalsComponent implements OnInit {
   dataSource = new MatTableDataSource<Product>();
   selection = new SelectionModel<Product>(true, []);
   isLoading = true;
-  pageSize = 10;
-  currentPage = 0;
+  pageSize = 5;
+  currentPage = 1;
   totalItems = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -110,10 +110,11 @@ export class ApprovalsComponent implements OnInit {
 
   private loadPendingProducts(): void {
     this.isLoading = true;
-    this.productService.getProducts(this.currentPage + 1, this.pageSize).subscribe({
+    this.productService.getProducts(this.currentPage, this.pageSize).subscribe({
       next: (response) => {
         this.dataSource.data = response.data;
-        this.totalItems = response.total;
+        this.totalItems = response.pagination.totalItems;
+        this.currentPage = response.pagination.currentPage;
         this.dataSource.sort = this.sort;
         this.selection.clear();
         this.isLoading = false;
@@ -125,8 +126,8 @@ export class ApprovalsComponent implements OnInit {
     });
   }
 
-  onPageChange(event: any): void {
-    this.currentPage = event.pageIndex;
+  onPageChange(event: any): void {    
+    this.currentPage = event.pageIndex || 1;
     this.pageSize = event.pageSize;
     this.loadPendingProducts();
   }
@@ -153,6 +154,7 @@ export class ApprovalsComponent implements OnInit {
   approveProduct(product: Product): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
+      disableClose: true,
       data: {
         title: 'Approve Product',
         message: `Are you sure you want to approve "${product.productName}" ?`,
@@ -179,6 +181,7 @@ export class ApprovalsComponent implements OnInit {
   rejectProduct(product: Product): void {
     const dialogRef = this.dialog.open(RejectModalComponent, {
       width: '500px',
+      disableClose: true,
       data: product ? { ...product } : null,
     });
 
@@ -188,14 +191,26 @@ export class ApprovalsComponent implements OnInit {
   viewProduct(product: Product): void {
     let dialogRef = this.dialog.open(ProductViewModalComponent, {
       width: '80vw',
+      disableClose: true,
       maxWidth: '800px',
       height: '80vh',
       maxHeight: '700px',
       data: product
     });
     dialogRef.afterClosed().subscribe({
-      next: (result) => { if(result) this.loadPendingProducts(); },
-      
+      next: (result) => {
+        if (result) {
+          this.productService.approveProduct(product.inventoryMasterId).subscribe({
+            next: () => {
+              this.loadPendingProducts();
+              this.snackBar.open('Product approved successfully', 'Close', { duration: 3000 });
+            },
+            error: (error) => {
+              this.snackBar.open('Error approving product', 'Close', { duration: 3000 });
+            }
+          });
+        }
+      }
     });
   }
 
@@ -205,6 +220,7 @@ export class ApprovalsComponent implements OnInit {
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
+      disableClose: true,
       data: {
         title: 'Bulk Approve Products',
         message: `Are you sure you want to approve ${selectedProducts.length} selected products?`,
@@ -233,7 +249,8 @@ export class ApprovalsComponent implements OnInit {
     if (selectedProducts.length === 0) return;
 
     const dialogRef = this.dialog.open(RejectModalComponent, {
-      width: '500px'
+      width: '500px',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(result => {

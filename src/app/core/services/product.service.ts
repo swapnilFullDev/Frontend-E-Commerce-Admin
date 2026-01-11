@@ -43,6 +43,10 @@ export class ProductService {
     return this.httpClient.get(`${environment.API_URL}${environment.inventoryMiddleWare}/get/online/verified`);
   }
 
+  getOnlineRejectProducts(page: number, pageSize: number): Observable<any> {
+    return this.httpClient.get(`${environment.API_URL}${environment.inventoryMiddleWare}/getAll/rejected/online?page=${page}&limit=${pageSize}`);
+  }
+
   deleteProduct(id: number): Observable<boolean> {
     const currentProducts = this.productsSubject.value;
     const filteredProducts = currentProducts.filter((p) => p.id !== id);
@@ -55,7 +59,7 @@ export class ProductService {
     return this.httpClient.post(`${environment.API_URL}${environment.inventoryMiddleWare}/verify-online/${id}`, {})
   }
 
-  rejectProduct(id: number, remark: string): Observable<any> {
-    return this.httpClient.put(`${environment.API_URL}${environment.inventoryMiddleWare}/reject/inventoryMasterId/${id}`, { remark });
+  rejectProduct(id: number, rejectOnlineProductRemark: string): Observable<any> {
+    return this.httpClient.put(`${environment.API_URL}${environment.inventoryMiddleWare}/reject-online-product/inventoryMasterId/${id}`, { rejectOnlineProductRemark });
   }
 }

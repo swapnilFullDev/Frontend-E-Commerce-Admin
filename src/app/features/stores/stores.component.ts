@@ -17,7 +17,8 @@ import { StoreService } from '../../core/services/store.service';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { AddStore } from './add-store/add-store';
+import { ViewStore } from './view-store/view-store';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: "app-stores",
@@ -36,7 +37,8 @@ import { AddStore } from './add-store/add-store';
     MatCardModule,
     MatChipsModule,
     LoadingComponent,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    MatCheckboxModule
   ],
   templateUrl: './stores.html',
 })
@@ -60,6 +62,8 @@ export class StoresComponent implements OnInit, AfterViewInit {
   totalItems = 0;
   totalPages = 0;
   searchTerm = '';
+  isVerified = "";
+  checkboxState = 0; // 0: unchecked, 1: checked, 2: indeterminate
   
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -86,14 +90,14 @@ export class StoresComponent implements OnInit, AfterViewInit {
   }
 
   onPageChange(event: any): void {
-    this.currentPage = event.pageIndex + 1;
+    this.currentPage = event.pageIndex || 1;
     this.pageSize = event.pageSize;
     this.loadStores();
   }
 
   private loadStores(): void {
     this.isLoading = true;
-    this.storeService.getStores(this.currentPage, this.pageSize, this.searchTerm).subscribe({
+    this.storeService.getStores(this.currentPage, this.pageSize, this.searchTerm,this.isVerified).subscribe({
       next: (response: any) => {
         console.log(response);
         this.dataSource.data = response.data;
@@ -128,7 +132,53 @@ export class StoresComponent implements OnInit, AfterViewInit {
       console.error('Error updating status', err);
     },
   });
-}
+  }
+
+  isVerifiedToggle(){
+    this.checkboxState = (this.checkboxState + 1) % 3;
+    
+    switch(this.checkboxState) {
+      case 0: // unchecked - show all
+        this.isVerified = "";
+        break;
+      case 1: // checked - show verified only
+        this.isVerified = "true";
+        break;
+      case 2: // indeterminate - show unverified only
+        this.isVerified = "false";
+        break;
+    }
+    
+    this.currentPage = 1;
+    if (this.paginator) {
+      this.paginator.pageIndex = 0;
+    }
+    this.loadStores();
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.isVerified = '';
+    this.checkboxState = 0;
+    this.currentPage = 1;
+    if (this.paginator) {
+      this.paginator.pageIndex = 0;
+    }
+    // Clear search input
+    const searchInput = document.querySelector('input[matInput]') as HTMLInputElement;
+    if (searchInput) {
+      searchInput.value = '';
+    }
+    this.loadStores();
+  }
+
+  get isCheckboxChecked(): boolean {
+    return this.checkboxState === 1;
+  }
+
+  get isCheckboxIndeterminate(): boolean {
+    return this.checkboxState === 2;
+  }
 
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -141,7 +191,9 @@ export class StoresComponent implements OnInit, AfterViewInit {
   }
 
   openStoreModal(store?: Store): void {
-    const dialogRef = this.dialog.open(AddStore, {
+    const dialogRef = this.dialog.open(ViewStore, {
+      autoFocus: false,
+      disableClose: true,
       width: "700px",
       data: store || null,
     });
@@ -161,6 +213,7 @@ export class StoresComponent implements OnInit, AfterViewInit {
   deleteStore(store: Store): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: "400px",
+      disableClose: true,
       data: {
         title: "Delete Store",
         message: `Are you sure you want to delete "${store.businessName}"? This action cannot be undone.`,

@@ -86,7 +86,7 @@ export class Categorys {
   }
 
   onPageChange(event: PageEvent) {
-    this.currentPage = event.pageIndex + 1; // paginator starts from 0
+    this.currentPage = event.pageIndex || 1; // paginator starts from 0
     this.pageSize = event.pageSize;
     this.loadCategories();
   }
@@ -98,6 +98,7 @@ export class Categorys {
 
   openCategoryModal(category?: Category): void {
     const dialogRef = this.dialog.open(AddCategory, {
+      disableClose: true,
       width: "600px",
       data: category || null,
     });
@@ -118,6 +119,7 @@ export class Categorys {
 
   deleteCategory(category: Category): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      disableClose: true,
       width: "400px",
       data: {
         title: "Delete Product",

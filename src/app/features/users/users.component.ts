@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
@@ -8,8 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -18,13 +17,14 @@ import { User } from '../../core/models/user.interface';
 import { UserService } from '../../core/services/user.service';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
-import { AddUser } from './add-user/add-user';
+import { ViewUser } from './view-user/view-user';
 
 @Component({
   selector: 'app-users',
   standalone: true,
   imports: [
     CommonModule,
+    NgOptimizedImage,
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
@@ -41,8 +41,8 @@ import { AddUser } from './add-user/add-user';
   templateUrl: './users.html' 
 })
 export class UsersComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'name', 'email', 'role', 'status', 'createdAt', 'actions'];
-  dataSource = new MatTableDataSource<User>();
+  displayedColumns: string[] = ['userImage','name', 'email', 'gender', 'status', 'createdAt', 'actions'];
+  dataSource = new MatTableDataSource<User|any>();
   isLoading = true;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -88,8 +88,9 @@ export class UsersComponent implements OnInit {
   }
 
   openUserModal(user?: User): void {
-    const dialogRef = this.dialog.open(AddUser, {
+    const dialogRef = this.dialog.open(ViewUser, {
       width: '500px',
+      disableClose: true,
       data: user || null
     });
 
@@ -104,23 +105,37 @@ export class UsersComponent implements OnInit {
   deleteUser(user: User): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
+      disableClose: true,
       data: {
         title: 'Delete User',
-        message: `Are you sure you want to delete ${user.name}? This action cannot be undone.`,
+        message: `Are you sure you want to delete ${user.fullName}? This action cannot be undone.`,
         confirmText: 'Delete',
+        permanentDelete: 'Permanent Delete',
         cancelText: 'Cancel'
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.userService.deleteUser(user.id).subscribe({
+      if (result == "Permanent") {
+        this.userService.permanentDeleteUser(user.userId).subscribe({
           next: () => {
             this.loadUsers();
-            this.snackBar.open('User deleted successfully', 'Close', { duration: 3000 });
+            this.snackBar.open('User permanent deleted successfully', 'Close', { duration: 3000 });
           },
-          error: (error) => {
-            this.snackBar.open('Error deleting user', 'Close', { duration: 3000 });
+          error: () => {
+            this.snackBar.open('Error permanent deleting user', 'Close', { duration: 3000 });
+          }
+        });
+      }else{
+        console.log(result);
+        
+        this.userService.softDeleteUser(user.userId).subscribe({
+          next: () => {
+            this.loadUsers();
+            this.snackBar.open('User soft deleted successfully', 'Close', { duration: 3000 });
+          },
+          error: () => {
+            this.snackBar.open('Error soft deleting user', 'Close', { duration: 3000 });
           }
         });
       }
