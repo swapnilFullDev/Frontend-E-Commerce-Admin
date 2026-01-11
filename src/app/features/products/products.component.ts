@@ -45,7 +45,7 @@ export class ProductsComponent implements OnInit {
   dataSource = new MatTableDataSource<any>();
   isLoading = true;
   pageSize = 10;
-  currentPage = 0;
+  currentPage = 1;
   totalItems = 0;
   hasActiveChildRoute = false;
 
@@ -60,23 +60,29 @@ export class ProductsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadProducts();
-    this.checkActiveRoute();
-    
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
-      this.checkActiveRoute();
-    });
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.checkActiveRouteAndLoad();
+      });
+
+    // Run once on initial load
+    this.checkActiveRouteAndLoad();
   }
 
-  private checkActiveRoute(): void {
-    this.hasActiveChildRoute = this.router.url !== '/products';
+  private checkActiveRouteAndLoad(): void {
+    const isProductsRoot = this.router.url === '/products';
+
+    this.hasActiveChildRoute = !isProductsRoot;
+
+    if (isProductsRoot) {
+      this.loadProducts();
+    }
   }
 
   private loadProducts(): void {
     this.isLoading = true;
-    this.productService.getOnlineVerifiedProducts(this.currentPage + 1, this.pageSize).subscribe({
+    this.productService.getOnlineVerifiedProducts(this.currentPage, this.pageSize).subscribe({
       next: (response) => {
         this.dataSource.data = response.data;
         this.totalItems = response.pagination.totalItems;
@@ -91,7 +97,7 @@ export class ProductsComponent implements OnInit {
   }
 
   onPageChange(event: any): void {
-    this.currentPage = event.pageIndex;
+    this.currentPage = event.pageIndex || 1;
     this.pageSize = event.pageSize;
     this.loadProducts();
   }
@@ -101,22 +107,10 @@ export class ProductsComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  // openProductModal(product?: Product): void {
-  //   const dialogRef = this.dialog.open(AddProduct, {
-  //     width: '600px',
-  //     data: product || null
-  //   });
-  //   dialogRef.afterClosed().subscribe(result => {
-  //     if (result) {
-  //       this.loadProducts();
-  //       this.snackBar.open(product ? 'Product updated successfully' : 'Product created successfully', 'Close', { duration: 3000 });
-  //     }
-  //   });
-  // }
-
   deleteProduct(product: Product): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
+      disableClose: true,
       data: {
         title: 'Delete Product',
         message: `Are you sure you want to delete "${product.name}"? This action cannot be undone.`,

@@ -28,7 +28,7 @@ export class RentalProductService {
   }
 
   getRentalRejectProducts(page: number, pageSize: number): Observable<any> {
-    return this.httpClient.get(`${environment.API_URL}${environment.inventoryMiddleWare}/getAll/rejected?page=${page}&limit=${pageSize}`);
+    return this.httpClient.get(`${environment.API_URL}${environment.inventoryMiddleWare}/getAll/rejected/rental?page=${page}&limit=${pageSize}`);
   }
 
   deleteRentalProduct(id: number) {
@@ -43,7 +43,7 @@ export class RentalProductService {
     return this.httpClient.post(`${environment.API_URL}${environment.inventoryMiddleWare}/verify-rental/${id}`, { });
    }
 
-  rejectRentalProduct(id: number, remark: string) { 
-    return this.httpClient.put(`${environment.API_URL}${environment.inventoryMiddleWare}/reject/inventoryMasterId/${id}`, { remark });
+  rejectRentalProduct(id: number, rejectRentalProductRemark: string) { 
+    return this.httpClient.put(`${environment.API_URL}${environment.inventoryMiddleWare}/reject-rental-product/inventoryMasterId/${id}`, { rejectRentalProductRemark });
   }
 }

@@ -111,8 +111,31 @@ body {
   height: 300px;
 }
 
+.dialog-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mat-mdc-dialog-actions{
+  padding: 10px 19px !important;
+}
+
+.square-icon-btn {
+  border-radius: 10px !important; /* square with slight rounding */
+}
+
+/* Override ripple */
+.square-icon-btn .mat-mdc-button-persistent-ripple,
+.square-icon-btn .mat-mdc-button-ripple {
+  border-radius: 10px !important;
+}
+
 @media (max-width: 768px) {
   .chart-container {
     height: 250px;
+  }
+  .mat-mdc-paginator-range-label{
+    margin: 0 10px 0 10px !important;
   }
 }

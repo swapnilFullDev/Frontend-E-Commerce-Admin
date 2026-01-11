@@ -265,6 +265,7 @@ export class OrdersComponent implements OnInit {
   viewOrderDetails(order: Order): void {
     this.dialog.open(OrderDetailModalComponent, {
       width: '800px',
+      disableClose: true,
       data: order
     });
   }

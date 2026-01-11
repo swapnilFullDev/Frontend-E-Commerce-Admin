@@ -18,6 +18,7 @@ import { RentalProductService } from '../../../core/services/rentalProduct.servi
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
 import { CommonUtils } from '../../../shared/utils/common.utils';
 import { RejectViewModalComponent } from '../../../shared/components/reject-view-modal/reject-view-modal.component';
+import { ProductService } from '../../../core/services/product.service';
 
 @Component({
   selector: 'app-rental-reject',
@@ -45,15 +46,15 @@ export class OnlineReject {
   dataSource = new MatTableDataSource<Product>();
   selection = new SelectionModel<Product>(true, []);
   isLoading = true;
-  pageSize = 10;
-  currentPage = 0;
+  pageSize = 5;
+  currentPage = 1;
   totalItems = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
-    private rentalProductService: RentalProductService,
+    private productService: ProductService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) { }
@@ -64,10 +65,10 @@ export class OnlineReject {
 
   private loadPendingProducts(): void {
     this.isLoading = true;
-    this.rentalProductService.getRentalRejectProducts(this.currentPage + 1, this.pageSize).subscribe({
+    this.productService.getOnlineRejectProducts(this.currentPage, this.pageSize).subscribe({
       next: (response) => {
-        this.dataSource.data = response.data.onlineRejected.items;
-        this.totalItems = response.pagination.totalItems - 2;
+        this.dataSource.data = response.data.items;
+        this.totalItems = response.data.pagination.totalItems;
         this.dataSource.sort = this.sort;
         this.selection.clear();
         this.isLoading = false;
@@ -80,7 +81,7 @@ export class OnlineReject {
   }
 
   onPageChange(event: any): void {
-    this.currentPage = event.pageIndex;
+    this.currentPage = event.pageIndex || 1;
     this.pageSize = event.pageSize;
     this.loadPendingProducts();
   }
@@ -97,6 +98,7 @@ export class OnlineReject {
   viewRemark(product: any): void {
     this.dialog.open(RejectViewModalComponent, {
       width: '400px',
+      disableClose: true,
       data: { remark: product.remark }
     });
   }

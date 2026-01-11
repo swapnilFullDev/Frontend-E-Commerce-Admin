@@ -1,11 +1,25 @@
+interface Address {
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
 export interface User {
-  id: number;
+  userId: number;
   name: string;
+  fullName: string;
   email: string;
+  phone?: string;
+  gender?: 'Male' | 'Female' | 'Other';
+  profileImage?: string;
   role: 'Admin' | 'Manager' | 'Employee';
-  avatar?: string;
-  createdAt: Date;
   isActive: boolean;
+  isDeleted: boolean;
+  // addressInfo?: Address;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  createdAt: Date;
 }
 
 export interface LoginCredentials {

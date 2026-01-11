@@ -91,6 +91,7 @@ export class MainLayoutComponent implements OnInit {
       
       this.dialog.open(ProfileModalComponent, {
         width: '800px',
+        disableClose: true,
         maxHeight: '90vh',
         data: {
           isEdit: true,
@@ -102,7 +103,8 @@ export class MainLayoutComponent implements OnInit {
 
   openChangePassword(): void {
     this.dialog.open(ChangePasswordModalComponent, {
-      width: '400px'
+      width: '400px',
+      disableClose: true,
     });
   }
 }

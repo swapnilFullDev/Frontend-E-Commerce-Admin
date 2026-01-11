@@ -82,7 +82,7 @@ export class AddInventory implements OnInit {
     });
 
     // Prepopulate images if provided
-    console.log(this.data);
+
     const imagesRaw = (this.data as any)?.imageUrls;
     if (imagesRaw && Array.isArray(imagesRaw)) {
       imagesRaw.forEach((img: any) => {
@@ -115,9 +115,9 @@ export class AddInventory implements OnInit {
       color: [variant?.color || '', Validators.required],
       qty: [variant?.qty || 0, [Validators.required, Validators.min(1)]],
       price: [variant?.price || 0, [Validators.required, Validators.min(1)]],
-      rentalPrice: [variant?.rentalPrice || 0, [Validators.required, Validators.min(1)]],
-      advancePrice: [variant?.advancePrice || 0, [Validators.required, Validators.min(1)]],
-      minimumDaysRental: [variant?.minimumDaysRental || '', Validators.required],
+      rentalPrice: [variant?.rentalPrice || 0],
+      advancePrice: [variant?.advancePrice || 0],
+      minimumDaysRental: [variant?.minimumDaysRental || 0],
     });
   }
 

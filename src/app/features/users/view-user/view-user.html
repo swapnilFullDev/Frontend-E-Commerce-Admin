@@ -1,0 +1,89 @@
+<div class="max-h-[80vh] overflow-y-auto">
+  <div class="p-4 sm:p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-xl sm:text-2xl font-semibold text-gray-800">User Details</h1>
+      <button mat-icon-button aria-label="close dialog" class="square-icon-btn" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <!-- Profile Image -->
+     @if(data?.profileImage){
+       <div class="flex justify-center mb-6">
+         <img [src]="data!.profileImage" alt="Profile Image" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200">
+       </div>
+     }
+    
+    <!-- Personal Information -->
+    <div class="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+      <h2 class="text-lg font-medium text-gray-700 mb-4 border-b border-gray-100 pb-2">Personal Information</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-medium text-gray-600">Full Name</label>
+          <p class="text-gray-900 mt-1">{{ data?.fullName || 'N/A' }}</p>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-600">Username</label>
+          <p class="text-gray-900 mt-1">{{ data?.fullName || 'N/A' }}</p>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-600">Email Address</label>
+          <p class="text-gray-900 mt-1">{{ data?.email || 'N/A' }}</p>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-600">Phone Number</label>
+          <p class="text-gray-900 mt-1">{{ data?.phone || 'N/A' }}</p>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-600">Gender</label>
+          <p class="text-gray-900 mt-1">{{ data?.gender || 'N/A' }}</p>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-600">User ID</label>
+          <p class="text-gray-900 mt-1">{{ data?.userId || 'N/A' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Address Information -->
+    <div class="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+      <h2 class="text-lg font-medium text-gray-700 mb-4 border-b border-gray-100 pb-2">Address Information</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-medium text-gray-600">Address</label>
+          <p class="text-gray-900 mt-1">{{ data?.address || 'N/A' }}</p>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-600">Coordinates</label>
+          <!-- <p class="text-gray-900 mt-1">
+            {{ data?.latitude && data?.longitude ? data.latitude + ', ' + data.longitude : 'N/A' }}
+          </p> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Status -->
+    <div class="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+      <h2 class="text-lg font-medium text-gray-700 mb-4 border-b border-gray-100 pb-2">Account Status</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-medium text-gray-600">Account Status</label>
+          <p class="text-gray-900 mt-1">
+            <span [class]="!data?.isDeleted ? 'text-green-600 bg-green-100 px-2 py-1 rounded-full text-xs' : 'text-red-600 bg-red-100 px-2 py-1 rounded-full text-xs'">
+              {{ !data?.isDeleted ? 'Active' : 'Deleted' }}
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200">
+      <button mat-button (click)="onCancel()" class="w-full sm:w-auto order-2 sm:order-1">
+        Cancel
+      </button>
+      <button mat-raised-button color="warn" (click)="onDelete()" class="w-full sm:w-auto order-1 sm:order-2">
+        Delete User
+      </button>
+    </div>
+  </div>
+</div>

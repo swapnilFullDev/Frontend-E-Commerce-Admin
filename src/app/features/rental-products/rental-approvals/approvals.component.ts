@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatSortModule, MatSort } from '@angular/material/sort';
@@ -46,13 +46,13 @@ export class RejectModalComponent {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.rejectForm = this.fb.group({
-      comments: ['']
+      comments: ['',[Validators.required,Validators.minLength(5)]]
     });
   }
 
   onReject(): void {
-    this.isLoading = true;
-    this.rentalProductService.rejectRentalProduct(this.data.inventoryMasterId, this.rejectForm.get('remark')?.value || '').subscribe({
+    this.isLoading = true;    
+    this.rentalProductService.rejectRentalProduct(this.data.inventoryMasterId, this.rejectForm.get('comments')?.value || '').subscribe({
       next: () => {
         this.dialogRef.closeAll();
         this.isLoading = false;
@@ -90,8 +90,8 @@ export class RentalApprovalsComponent implements OnInit {
   dataSource = new MatTableDataSource<Product>();
   selection = new SelectionModel<Product>(true, []);
   isLoading = true;
-  pageSize = 10;
-  currentPage = 0;
+  pageSize = 5;
+  currentPage = 1;
   totalItems = 0;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -109,10 +109,11 @@ export class RentalApprovalsComponent implements OnInit {
 
   private loadPendingProducts(): void {
     this.isLoading = true;
-    this.rentalProductService.getPendingProducts(this.currentPage + 1, this.pageSize).subscribe({
+    this.rentalProductService.getPendingProducts(this.currentPage, this.pageSize).subscribe({
       next: (response) => {
         this.dataSource.data = response.data;
-        this.totalItems = response.total;
+        this.totalItems = response.pagination.totalItems;
+        this.currentPage = response.pagination.currentPage;
         this.dataSource.sort = this.sort;
         this.selection.clear();
         this.isLoading = false;
@@ -125,7 +126,7 @@ export class RentalApprovalsComponent implements OnInit {
   }
 
   onPageChange(event: any): void {
-    this.currentPage = event.pageIndex;
+    this.currentPage = event.pageIndex || 1;
     this.pageSize = event.pageSize;
     this.loadPendingProducts();
   }
@@ -152,6 +153,7 @@ export class RentalApprovalsComponent implements OnInit {
   approveProduct(product: Product): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
+      disableClose: true,
       data: {
         title: 'Approve Product',
         message: `Are you sure you want to approve "${product.productName}" ?`,
@@ -177,20 +179,24 @@ export class RentalApprovalsComponent implements OnInit {
 
   rejectProduct(product: Product): void {
     const dialogRef = this.dialog.open(RejectModalComponent, {
-      width: '500px'
+      width: '500px',
+      data: product ? { ...product } : null,
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.rentalProductService.rejectRentalProduct(product.id, result.comments).subscribe({
-          next: () => {
-            this.loadPendingProducts();
-            this.snackBar.open('Product rejected successfully', 'Close', { duration: 3000 });
-          },
-          error: (error) => {
-            this.snackBar.open('Error rejecting product', 'Close', { duration: 3000 });
-          }
-        });
+        console.log(result);
+        
+        this.loadPendingProducts();
+        this.snackBar.open('Product rejected successfully', 'Close', { duration: 3000 });
+        // this.rentalProductService.rejectRentalProduct(product.id, result.comments).subscribe({
+        //   next: () => {
+        //   },
+        //   error: (error) => {
+        //     this.snackBar.open('Error rejecting product', 'Close', { duration: 3000 });
+        //   }
+        // });
       }
     });
   }
@@ -198,14 +204,26 @@ export class RentalApprovalsComponent implements OnInit {
   viewProduct(product: Product): void {
     let dialogRef = this.dialog.open(ProductViewModalComponent, {
       width: '80vw',
+      disableClose: true,
       maxWidth: '800px',
       height: '80vh',
       maxHeight: '700px',
       data: product
     });
     dialogRef.afterClosed().subscribe({
-      next: (result) => { if(result) this.loadPendingProducts(); },
-      
+      next: (result) => {
+        if (result) {
+          this.rentalProductService.approveRentalProduct(product.inventoryMasterId).subscribe({
+            next: () => {
+              this.loadPendingProducts();
+              this.snackBar.open('Product approved successfully', 'Close', { duration: 3000 });
+            },
+            error: (error) => {
+              this.snackBar.open('Error approving product', 'Close', { duration: 3000 });
+            }
+          });
+        }
+      }
     });
   }
 
@@ -215,6 +233,7 @@ export class RentalApprovalsComponent implements OnInit {
 
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '400px',
+      disableClose: true,
       data: {
         title: 'Bulk Approve Products',
         message: `Are you sure you want to approve ${selectedProducts.length} selected products?`,
@@ -243,7 +262,8 @@ export class RentalApprovalsComponent implements OnInit {
     if (selectedProducts.length === 0) return;
 
     const dialogRef = this.dialog.open(RejectModalComponent, {
-      width: '500px'
+      width: '500px',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(result => {

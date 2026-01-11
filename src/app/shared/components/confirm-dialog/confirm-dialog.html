@@ -3,9 +3,15 @@
       <p>{{ data.message }}</p>
     </div>
     <div mat-dialog-actions class="flex justify-space-between gap-2">
-      <button mat-button [mat-dialog-close]="false" class="text-gray-600">
+      @if(data.title === 'Delete User'){
+      <button mat-button [mat-dialog-close]="'Permanent'" class="text-gray-600">
+        {{ data.permanentDelete || 'Cancel' }}
+      </button>
+      }@else{
+        <button mat-button [mat-dialog-close]="false" class="text-gray-600">
         {{ data.cancelText || 'Cancel' }}
       </button>
+      }
       <button mat-raised-button color="warn" [mat-dialog-close]="true">
         {{ data.confirmText || 'Confirm' }}
       </button>

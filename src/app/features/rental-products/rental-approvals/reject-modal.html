@@ -11,7 +11,7 @@
 </div>
 <div mat-dialog-actions class="flex justify-end gap-2">
     <button mat-button [mat-dialog-close]="null">Cancel</button>
-    <button mat-raised-button color="warn" [disabled]="rejectForm.invalid || isLoading" (click)="onReject()">
+    <button mat-raised-button color="warn" [mat-dialog-close]="true" [disabled]="rejectForm.invalid || isLoading" (click)="onReject()">
         {{ isLoading ? 'Rejecting...' : 'Reject Product' }}
     </button>
 </div>

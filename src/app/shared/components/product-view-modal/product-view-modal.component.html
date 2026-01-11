@@ -1,7 +1,7 @@
 <div class="product-modal">
   <div mat-dialog-title class="modal-header">
     <h2>{{ data.productName }}</h2>
-    <button mat-icon-button (click)="close()">
+    <button mat-icon-button [mat-dialog-close]="false" class="square-icon-btn">
       <mat-icon>close</mat-icon>
     </button>
   </div>
@@ -128,7 +128,7 @@
   </div>
 
   <div mat-dialog-actions class="modal-actions flex justify-around items-center gap-2">
-    <button mat-raised-button color="primary" (click)="approveProduct()">Approve</button>
-    <button mat-raised-button color="warn" (click)="close()">Close</button>
+    <button mat-raised-button color="primary" [mat-dialog-close]="true" >Approve</button>
+    <button mat-raised-button color="warn" [mat-dialog-close]="false" >Close</button>
   </div>
 </div>

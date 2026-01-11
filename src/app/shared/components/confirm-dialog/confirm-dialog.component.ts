@@ -7,6 +7,7 @@ export interface ConfirmDialogData {
   title: string;
   message: string;
   confirmText?: string;
+  permanentDelete?: string,
   cancelText?: string;
 }
 
